@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Package IgnorableNamespaces="build" xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest" xmlns:build="http://schemas.microsoft.com/developer/appx/2012/build">
+  
+  <Resources>
+    <Resource Language="EN"/>
+    <Resource m2:Scale="100"/>
+    
+  </Resources>
+  <Identity Name="Ubisoft.RaymanFiestaRun" Version="1.1.0.5" Publisher="CN=C3139357-8858-4D2E-A18E-8ADEAB85C66A" ProcessorArchitecture="x86"/>
+  <Properties>
+    <DisplayName>Rayman Fiesta Run</DisplayName>
+    <PublisherDisplayName>Ubisoft</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+  <Prerequisites>
+    <OSMinVersion>6.3.0</OSMinVersion>
+    <OSMaxVersionTested>6.3.0</OSMaxVersionTested>
+  </Prerequisites>
+  <Applications>
+    <Application Id="App" Executable="RFR_WinRT.exe" EntryPoint="RO1Mobile.App">
+      <Extensions>
+        <Extension Category="windows.protocol">
+          <Protocol Name="xboxliveapp-1431509853"/>
+        </Extension>
+      </Extensions>
+      <m2:VisualElements DisplayName="Rayman Fiesta Run" Description="Rayman Fiesta Run" BackgroundColor="#464646" ForegroundText="light" ToastCapable="true" Square150x150Logo="Assets\Logo.png" Square30x30Logo="Assets\SmallLogo.png">
+        <m2:DefaultTile Wide310x150Logo="Assets\WideLogo.png" ShortName="Rayman Fiesta Run" DefaultSize="wide310x150Logo">
+          <m2:ShowNameOnTiles>
+            <m2:ShowOn Tile="square150x150Logo"/>
+          </m2:ShowNameOnTiles>
+        </m2:DefaultTile>
+        <m2:InitialRotationPreference>
+          <m2:Rotation Preference="landscape"/>
+          <m2:Rotation Preference="landscapeFlipped"/>
+        </m2:InitialRotationPreference>
+        <m2:SplashScreen BackgroundColor="#000000" Image="Assets\SplashScreen.png"/>
+        <m2:ApplicationView MinWidth="default"/>
+      </m2:VisualElements>
+    </Application>
+  </Applications>
+  <Capabilities>
+    <Capability Name="internetClient"/>
+  </Capabilities>
+  <Extensions>
+    <Extension Category="windows.activatableClass.proxyStub">
+      <ProxyStub ClassId="10EE0CAA-F78A-4AE6-A92C-8988E2DEDB00">
+        <Path>Microsoft.Xbox.dll</Path>
+        <Interface Name="Microsoft.Xbox.Interop.ICallbackInvoker" InterfaceId="3DBDEF74-8B05-4318-8A5C-D790039C0576"/>
+      </ProxyStub>
+    </Extension>
+    <Extension Category="windows.activatableClass.inProcessServer">
+      <InProcessServer>
+        <Path>Microsoft.Xbox.dll</Path>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Marketplace.AssetBalance" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Marketplace.MarketplaceService" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Leaderboards.LeaderboardService" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Leaderboards.LeaderboardAttribute" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.XboxLIVEService" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.User" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.UserCollection" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Foundation.UserIdentity" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Foundation.ServiceClient" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Foundation.PushNotificationManager" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Recipient" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Multiplayer.MatchmakingService" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Multiplayer.MultiplayerSessionSettings" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Multiplayer.MatchProperty" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Multiplayer.MultiplayerSession" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Multiplayer.MatchCriteria" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Multiplayer.MatchRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.TitleStorage.TitleStorageFile" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.TitleStorage.TitleStorageService" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.UserMessage" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.ResourceLoader" ThreadingModel="both"/>
+      </InProcessServer>
+    </Extension>
+    <Extension Category="windows.activatableClass.inProcessServer">
+      <InProcessServer>
+        <Path>CLRHost.dll</Path>
+        <ActivatableClass ActivatableClassId="FlurryWin8SDK.Api" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="FlurryWin8SDK.Models.Parameter" ThreadingModel="both"/>
+      </InProcessServer>
+    </Extension>
+  </Extensions>
+  <Dependencies>
+    <PackageDependency Name="Microsoft.VCLibs.120.00" MinVersion="12.0.21005.1"/>
+  </Dependencies>
+  <build:Metadata>
+    <build:Item Name="cl.exe" Version="18.00.31010.0 built by: REL"/>
+    <build:Item Name="VisualStudio" Version="14.0"/>
+    <build:Item Name="VisualStudioEdition" Value="Microsoft Visual Studio Professional 2015"/>
+    <build:Item Name="OperatingSystem" Version="10.0.10240.16384 (th1.150709-1700)"/>
+    <build:Item Name="Microsoft.Build.AppxPackage.dll" Version="14.0.23121.0"/>
+    <build:Item Name="ProjectGUID" Value="{205AF285-2622-4BE6-8A1F-A206B83FD17A}"/>
+    <build:Item Name="Microsoft.Windows.UI.Xaml.81.Build.Tasks.dll" Version="14.0.22705.1"/>
+    <build:Item Name="Xbox LIVE SDK for Windows 8.1" Version="2.0"/>
+    <build:Item Name="MakePri.exe" Version="6.3.9600.17336 (winblue.150226-1500)"/>
+  </build:Metadata>
+</Package>

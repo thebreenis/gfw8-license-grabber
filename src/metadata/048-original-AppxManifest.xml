@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Package IgnorableNamespaces="build" xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest" xmlns:build="http://schemas.microsoft.com/developer/appx/2012/build">
+  
+  <Identity Name="GAMETROOPERS.ImperiaOnlineTheGreatPeople" Version="6.1.8.8" Publisher="CN=2F77247A-CC37-4337-9551-CB801994E043" ProcessorArchitecture="x86"/>
+  <Properties>
+    <DisplayName>ms-resource:displayName</DisplayName>
+    <PublisherDisplayName>GAME TROOPERS</PublisherDisplayName>
+    <Logo>images\storelogo.png</Logo>
+  </Properties>
+  <Prerequisites>
+    <OSMinVersion>6.3.0</OSMinVersion>
+    <OSMaxVersionTested>6.3.0</OSMaxVersionTested>
+  </Prerequisites>
+  <Resources>
+    <Resource Language="EN-US"/>
+    <Resource Language="EN"/>
+    <Resource m2:Scale="100"/>
+    
+  </Resources>
+  <Applications>
+    <Application Id="App" StartPage="www\index.html">
+      <m2:VisualElements DisplayName="Imperia Online: Nomads Invasion" Description="Imperia Online is massively multiplayer online game, set in the times before gunpowder was invented. Welcome to the Medieval World, where the only rule is that there are no rules, if you want to be the Ultimate Emperor!" BackgroundColor="#1d415f" ForegroundText="light" ToastCapable="true" Square150x150Logo="images\logo.png" Square30x30Logo="img\smalllogo.png">
+        <m2:DefaultTile ShortName="Imperia Online" Wide310x150Logo="Assets\Wide310x150Logo.png" Square310x310Logo="images\558x558.png" Square70x70Logo="images\126x126.png"/>
+        <m2:InitialRotationPreference>
+          <m2:Rotation Preference="landscape"/>
+          <m2:Rotation Preference="landscapeFlipped"/>
+        </m2:InitialRotationPreference>
+        <m2:SplashScreen Image="SplashScreenDecorated.jpg" BackgroundColor="black"/>
+        <m2:ApplicationView MinWidth="width500"/>
+      </m2:VisualElements>
+      <Extensions>
+        <Extension Category="windows.protocol" StartPage="www\index.html">
+          <Protocol Name="xboxliveapp-1313086309">
+            <DisplayName>Imperia Online</DisplayName>
+          </Protocol>
+        </Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+  <Capabilities>
+    <Capability Name="internetClient"/>
+  </Capabilities>
+  <Extensions>
+    <Extension Category="windows.activatableClass.proxyStub">
+      <ProxyStub ClassId="10EE0CAA-F78A-4AE6-A92C-8988E2DEDB00">
+        <Path>Microsoft.Xbox.dll</Path>
+        <Interface Name="Microsoft.Xbox.Interop.ICallbackInvoker" InterfaceId="3DBDEF74-8B05-4318-8A5C-D790039C0576"/>
+      </ProxyStub>
+    </Extension>
+    <Extension Category="windows.activatableClass.inProcessServer">
+      <InProcessServer>
+        <Path>UniversalSharedLibrary.Windows.dll</Path>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Shared.WinRT.HttpClient" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Shared.WinRT.AdScheduler" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Shared.WinRT.AdTagCollection" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Shared.WinRT.AdExtension" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Shared.WinRT.Advertisement" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Shared.WinRT.SdkInfoProvider" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Shared.WinRT.EventLogging" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Shared.WinRT.AdPlacement" ThreadingModel="STA"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Shared.WinRT.UserUtils" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Shared.WinRT.AdErrorEventArgs" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Shared.WinRT.AdErrorReport" ThreadingModel="STA"/>
+      </InProcessServer>
+    </Extension>
+    <Extension Category="windows.activatableClass.inProcessServer">
+      <InProcessServer>
+        <Path>Microsoft.Xbox.dll</Path>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.User" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Leaderboards.LeaderboardService" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Leaderboards.LeaderboardAttribute" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Foundation.UserIdentity" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Foundation.ServiceClient" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Foundation.PushNotificationManager" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Recipient" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.ResourceLoader" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.UserMessage" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.UserCollection" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Marketplace.AssetBalance" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Marketplace.MarketplaceService" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.TitleStorage.TitleStorageService" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.TitleStorage.TitleStorageFile" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Multiplayer.MultiplayerSessionSettings" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Multiplayer.MatchCriteria" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Multiplayer.MatchmakingService" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Multiplayer.MultiplayerSession" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Multiplayer.MatchRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Multiplayer.MatchProperty" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.XboxLIVEService" ThreadingModel="both"/>
+      </InProcessServer>
+    </Extension>
+    <Extension Category="windows.activatableClass.inProcessServer">
+      <InProcessServer>
+        <Path>CLRHost.dll</Path>
+        <ActivatableClass ActivatableClassId="GameTroopers.Xbox.SignedOutArgs" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="GameTroopers.Xbox.XBOXAchievement" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="GameTroopers.Xbox.UnlockedAchievementArgs" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="GameTroopers.Xbox.SignInErrorArg" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="GameTroopers.Xbox.XBOXIdentity" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="GameTroopers.Xbox.XBOXProfile" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="GameTroopers.Xbox.XboxManager" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="GameTroopers.Xbox.PlayerInfoArgs" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="KochavaBridge.Core" ThreadingModel="both"/>
+      </InProcessServer>
+    </Extension>
+    <Extension Category="windows.activatableClass.inProcessServer">
+      <InProcessServer>
+        <Path>Kochava.dll</Path>
+        <ActivatableClass ActivatableClassId="Kochava.SharedInstance" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Kochava.LogLevel" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Kochava.Tracker" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Kochava.Config" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Kochava.EventParameters" ThreadingModel="both"/>
+      </InProcessServer>
+    </Extension>
+  </Extensions>
+  <Dependencies>
+    <PackageDependency Name="Microsoft.VCLibs.120.00" MinVersion="12.0.21005.1"/>
+    <PackageDependency Name="Microsoft.WinJS.2.0" MinVersion="1.0.9600.17018"/>
+  </Dependencies>
+  <build:Metadata>
+    <build:Item Name="VisualStudio" Version="14.0"/>
+    <build:Item Name="VisualStudioEdition" Value="Microsoft Visual Studio Community 2015"/>
+    <build:Item Name="OperatingSystem" Version="10.0.17134.165 (WinBuild.160101.0800)"/>
+    <build:Item Name="Microsoft.Build.AppxPackage.dll" Version="14.0.25431.1"/>
+    <build:Item Name="ProjectGUID" Value="efffab2f-bfc5-4eda-b545-45ef4995f55a"/>
+    <build:Item Name="Xbox LIVE SDK for Windows 8.1" Version="2.0"/>
+    <build:Item Name="MSAdvertisingJS" Version="8.5"/>
+    <build:Item Name="MakePri.exe" Version="6.3.9600.17336 (winblue.150226-1500)"/>
+  </build:Metadata>
+</Package>

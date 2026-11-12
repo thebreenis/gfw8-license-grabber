@@ -1,0 +1,149 @@
+{
+  "application": "GFW8 License Grabber",
+  "version": "1.4.6",
+  "validatedUtc": "2026-11-12T15:08:55.841592+00:00",
+  "coverage": {
+    "receiptEntries": 108,
+    "tokenConfigurations": 108,
+    "receiptOnlyEntries": 0,
+    "liveVerifiedGameIds": [
+      5,
+      6,
+      26,
+      41,
+      43,
+      44,
+      51
+    ],
+    "experimentalConfigurations": 101
+  },
+  "userAcceptedAssumptions": {
+    "MC5": "Receipt/token success assumed with correct entitlement, valid receipt and native sign-in; legacy title corroborated by supplied SPA.",
+    "DungeonHunter5": "Candidate legacy1195776868 and current identity707.1.7.0 enabled; no receipt/native token acceptance demonstrated."
+  },
+  "newLiveEvidence": {
+    "DML": {
+      "receiptSignatureVerified": true,
+      "tokenHttpStatus": 200,
+      "profileHttpStatus": 200,
+      "presenceHttpStatus": 200,
+      "activeReadback": true,
+      "presenceCleanupConfirmed": true
+    },
+    "MC5": "Store no-license before native auth",
+    "DungeonHunter5": "Store no-license before native auth"
+  },
+  "checks": {
+    "metadata": {
+      "checksPassed": 160,
+      "reviewedRoutesAdded": 11,
+      "receiptChoices": 108,
+      "tokenConfigurations": 108,
+      "independentlyVerifiedRouteIds": [
+        5,
+        6,
+        26,
+        41,
+        43,
+        44,
+        51
+      ],
+      "receiptOnlyIds": [],
+      "harvestFamilyCorrected": true,
+      "commentedIdentityIgnored": true,
+      "originalVersionsPreserved": true,
+      "existingConfigurationsUnchanged": true,
+      "noInstalledGameChanges": true,
+      "gameLaunches": 0,
+      "presenceOrAchievementCalls": 0
+    },
+    "installedScope": {
+      "checksPassed": 35,
+      "installedFreshReceiptDirect": true,
+      "installedTokenAndPresenceBlockedBeforeAuth": true,
+      "uninstalledTokenAndPromptIfNeededRetained": true,
+      "packageSwapEntryPointsRemoved": true,
+      "legacyRecoveryRetainedUnchanged": true,
+      "liveNetworkCalls": 0,
+      "realGamesModified": 0,
+      "gameLaunches": 0
+    },
+    "nativeCapture": {
+      "checksPassed": 14,
+      "oldFailureReproduced": true,
+      "completeStderrSaved": true,
+      "nonzeroExitPreserved": true,
+      "argumentQuotingVerified": true,
+      "actualPreflightTrapDetailsSaved": true,
+      "noNativeAuthenticationOrNetworkCalls": true,
+      "packageChanges": 0,
+      "gameLaunches": 0
+    },
+    "guiBackend": {
+      "checksPassed": 33,
+      "powerShellFilesParsed": 14,
+      "bulkTestsUseSyntheticResponses": true,
+      "liveNetworkCalls": 0,
+      "realImportedReceiptSignatureChecked": true,
+      "expiredAndTamperedImportsRejected": true,
+      "copyableLogCredentialRedactionChecked": true
+    },
+    "embeddedScope": {
+      "checksPassed": 5,
+      "embeddedInstalledDetectionPassed": true,
+      "successfulAvailabilityCheckSilent": true,
+      "embeddedTokenAndPresenceBlockedBeforeProofOrNetwork": true,
+      "obsoleteSwapActionRejected": true,
+      "liveNetworkCalls": 0,
+      "packageChanges": 0,
+      "gameLaunches": 0
+    },
+    "singleExe": {
+      "embeddedBundleVerified": true,
+      "embeddedWorkerSignedReceiptImport": true,
+      "gameId": 44,
+      "outputUsesExactFamilyName": true,
+      "privateRuntimePermissions": true,
+      "unwantedWarningRemoved": true,
+      "liveTokenOrPresenceRequests": 0,
+      "singleExeLaunchedWithoutAdjacentFiles": true
+    },
+    "gamePicker": {
+      "checksPassed": 7,
+      "halfSpeedWheelVerified": true,
+      "tabFromPopupItemCommitsSelection": true,
+      "tabAdvancesFocus": true,
+      "popupReopenVerified": true,
+      "liveNetworkCalls": 0
+    }
+  },
+  "assertionsPassed": 254,
+  "embeddedCatalogue108Verified": true,
+  "guiHelperMatchesLiveTestedBinary": true,
+  "helperSha256": "e16ed76d2a83b9752eae643a00723b1a3051c6c9eb69a58e53c8c73e528fdf72",
+  "payloadCrcVerified": true,
+  "payloadEntries": 35,
+  "nativePinAndInventoryMatch": true,
+  "credentialsBundled": false,
+  "executableSha256": "b85b05ada3c4fcc367e748a1436ad5b9ee1f9735394060fba29d1a68679628a4",
+  "limits": [
+    "Seven routes live-proven; all108 configured is not all108 service-proven.",
+    "MC5/DungeonHunter5 entitlement denied on this account; enabled under user-accepted assumptions.",
+    "DML Win10-derived identity plus original Win81 SDK succeeded; original Win8 package not recovered.",
+    "Window activation fix succeeded in DML retry; Windows broker/session state not isolated.",
+    "No additional live auth or Presence calls during release regression checks."
+  ],
+  "changes": {
+    "bulk": "Stage receipt attempts privately within batch; create family/Receipts folder only after valid receipt, move receipt and diagnostics then write final-path proof. No-license/errors retained in bulk-summary-private.json; temporary stage removed on normal completion/cancellation.",
+    "dropdownWheel": "Half system wheel-scroll lines measured in game-row heights; fractional pixel scrolling; handlers installed once across popup reopen.",
+    "dropdownTab": "Commits highlighted option, closes dropdown and advances focus. Shift+Tab selects and traverses backward."
+  },
+  "visibleUiVerification": {
+    "layoutModeNoNetwork": true,
+    "arrowHighlightThenTabCommitsKeflings": true,
+    "dropdownClosedAfterTab": true,
+    "focusMovedToReceiptButton": true,
+    "testWindowClosed": true
+  },
+  "existingEmptyGameFoldersRemoved": false
+}

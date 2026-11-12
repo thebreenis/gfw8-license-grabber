@@ -1,0 +1,173 @@
+[
+  {
+    "manifest": "metadata/AgeCastles-AppxManifest.xml",
+    "manifestSha256": "3c34ef3e2d9df3ad95087d833255dd707ba28d5269cae8d3f2a1a1db246af6c0",
+    "configuration": {
+      "gameId": 6,
+      "name": "Microsoft.AgeCastles",
+      "family": "Microsoft.AgeCastles_8wekyb3d8bbwe",
+      "publisher": "CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+      "version": "1.26.2.33",
+      "titleId": 1297292164,
+      "sdkProfile": "Win81",
+      "verification": "independent-local-success"
+    }
+  },
+  {
+    "manifest": "metadata/042-original-AppxManifest.xml",
+    "manifestSha256": "ca96f790e2f995cc478fbf9c44076bb156978eef0b3513c970565879f70dc522",
+    "configuration": {
+      "gameId": 42,
+      "name": "Microsoft.TheHarvestHD",
+      "family": "Microsoft.TheHarvestHD_8wekyb3d8bbwe",
+      "publisher": "CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+      "version": "1.2.0.82",
+      "titleId": 1297290235,
+      "sdkProfile": "Jetpack2012",
+      "verification": "experimental-not-independently-verified"
+    },
+    "cataloguePackageFamilyCorrection": {
+      "from": "Microsoft.TheHarvest_8wekyb3d8bbwe",
+      "to": "Microsoft.TheHarvestHD_8wekyb3d8bbwe"
+    }
+  },
+  {
+    "manifest": "metadata/048-original-AppxManifest.xml",
+    "manifestSha256": "dc8bf689f099fadbb26ceeca5d552eff41e97b4eaed33590aa629e6b212fabf6",
+    "configuration": {
+      "gameId": 48,
+      "name": "GAMETROOPERS.ImperiaOnlineTheGreatPeople",
+      "family": "GAMETROOPERS.ImperiaOnlineTheGreatPeople_334sksj6ker18",
+      "publisher": "CN=2F77247A-CC37-4337-9551-CB801994E043",
+      "version": "6.1.8.8",
+      "titleId": 1313086309,
+      "sdkProfile": "Win81",
+      "verification": "experimental-not-independently-verified"
+    }
+  },
+  {
+    "manifest": "metadata/057-original-AppxManifest.xml",
+    "manifestSha256": "918d4d9be1c0bf40b4beddb1f7418d71231c6f43429a09dd4ea7a424a5a4f868",
+    "configuration": {
+      "gameId": 57,
+      "name": "Microsoft.MicrosoftJigsaw",
+      "family": "Microsoft.MicrosoftJigsaw_8wekyb3d8bbwe",
+      "publisher": "CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+      "version": "1.7.1808.2102",
+      "titleId": 1297292166,
+      "sdkProfile": "Win81",
+      "verification": "experimental-not-independently-verified"
+    }
+  },
+  {
+    "manifest": "metadata/061-original-AppxManifest.xml",
+    "manifestSha256": "41186086b615262ddfc707801d096cdd292e48c762f6e2c661889b6a6cb57693",
+    "configuration": {
+      "gameId": 61,
+      "name": "Microsoft.MicrosoftSolitaireCollection",
+      "family": "Microsoft.MicrosoftSolitaireCollection_8wekyb3d8bbwe",
+      "publisher": "CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+      "version": "2.11.1807.1002",
+      "titleId": 1297287741,
+      "sdkProfile": "Win81",
+      "verification": "experimental-not-independently-verified"
+    }
+  },
+  {
+    "manifest": "metadata/062-original-AppxManifest.xml",
+    "manifestSha256": "b90c3bb8c12dfd610fc69f669055585111119a4d3a5a766ef625de50a61c558f",
+    "configuration": {
+      "gameId": 62,
+      "name": "Microsoft.MicrosoftSudoku",
+      "family": "Microsoft.MicrosoftSudoku_8wekyb3d8bbwe",
+      "publisher": "CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+      "version": "1.7.10190.0",
+      "titleId": 1297292189,
+      "sdkProfile": "Win81",
+      "verification": "experimental-not-independently-verified"
+    }
+  },
+  {
+    "manifest": "metadata/076-original-AppxManifest.xml",
+    "manifestSha256": "aa65235c43251918c94baf842958f820bbaac111f9ce586e612ed15783eb5669",
+    "configuration": {
+      "gameId": 76,
+      "name": "UbisoftEntertainment.RabbidsBigBang",
+      "family": "UbisoftEntertainment.RabbidsBigBang_dbgk1hhpxymar",
+      "publisher": "CN=C6D89DF1-FB66-4AAD-9100-AD9BE1186BE1",
+      "version": "2.0.0.1",
+      "titleId": 1431509852,
+      "sdkProfile": "Win81",
+      "verification": "experimental-not-independently-verified"
+    }
+  },
+  {
+    "manifest": "metadata/077-original-AppxManifest.xml",
+    "manifestSha256": "167b012c222ed4e2fdfa797137fbf0ab32a6474ef2af42c7bbe6f620441a374a",
+    "configuration": {
+      "gameId": 77,
+      "name": "Ubisoft.RaymanFiestaRun",
+      "family": "Ubisoft.RaymanFiestaRun_ngz4m417e0mpw",
+      "publisher": "CN=C3139357-8858-4D2E-A18E-8ADEAB85C66A",
+      "version": "1.1.0.5",
+      "titleId": 1431509853,
+      "sdkProfile": "Win81",
+      "verification": "experimental-not-independently-verified"
+    }
+  },
+  {
+    "manifest": "metadata/026-windows10-AppxManifest.xml",
+    "manifestSha256": "a2169ac24fdaf6f9d701cc72409001d3a98d3517f00ee611404c0f7ab2eb4c78",
+    "metadataEra": "Windows10",
+    "titleIdEvidence": "live-native-success",
+    "configuration": {
+      "gameId": 26,
+      "name": "A278AB0D.DragonManiaLegends",
+      "family": "A278AB0D.DragonManiaLegends_h6adky7gbf63m",
+      "publisher": "CN=276B8086-F8CA-495E-A880-D275ED83EA67",
+      "version": "8.1.14.0",
+      "titleId": 1195776870,
+      "sdkProfile": "Win81",
+      "verification": "independent-local-success",
+      "titleIdProvenance": "live-native-success",
+      "identityMetadataEra": "Windows10"
+    }
+  },
+  {
+    "manifest": "metadata/028-windows10-AppxManifest.xml",
+    "manifestSha256": "6e639d2beaf253845f36493bce400049517cc3b65f0dcb4d9009498d6e430a47",
+    "metadataEra": "Windows10",
+    "titleIdEvidence": "user-accepted-candidate",
+    "configuration": {
+      "gameId": 28,
+      "name": "A278AB0D.DungeonHunter5",
+      "family": "A278AB0D.DungeonHunter5_h6adky7gbf63m",
+      "publisher": "CN=276B8086-F8CA-495E-A880-D275ED83EA67",
+      "version": "707.1.7.0",
+      "titleId": 1195776868,
+      "sdkProfile": "Win81",
+      "verification": "experimental-not-independently-verified",
+      "titleIdProvenance": "user-accepted-candidate",
+      "identityMetadataEra": "Windows10"
+    },
+    "userAcceptedCandidate": true
+  },
+  {
+    "manifest": "metadata/064-windows10-AppxManifest.xml",
+    "manifestSha256": "db124b6f9c27387272dcb4ce519eb5e6224166d7f9d2c2a7c53f767e44e44e5c",
+    "metadataEra": "Windows10",
+    "titleIdEvidence": "package-spa",
+    "configuration": {
+      "gameId": 64,
+      "name": "A278AB0D.ModernCombat5Blackout",
+      "family": "A278AB0D.ModernCombat5Blackout_h6adky7gbf63m",
+      "publisher": "CN=276B8086-F8CA-495E-A880-D275ED83EA67",
+      "version": "5.8.7.0",
+      "titleId": 1195776867,
+      "sdkProfile": "Win81",
+      "verification": "experimental-not-independently-verified",
+      "titleIdProvenance": "package-spa",
+      "identityMetadataEra": "Windows10"
+    }
+  }
+]

@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Package IgnorableNamespaces="uap mp build" xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:build="http://schemas.microsoft.com/developer/appx/2015/build">
+  <Identity Name="A278AB0D.DungeonHunter5" Publisher="CN=276B8086-F8CA-495E-A880-D275ED83EA67" Version="707.1.7.0" ProcessorArchitecture="x86" />
+  <mp:PhoneIdentity PhoneProductId="bbd217a6-bdae-4e02-ab1f-4b79206538f1" PhonePublisherId="ebdc679e-ab8c-4ce5-ad00-2d008b87ced7" />
+  <Properties>
+    <DisplayName>ms-resource:DisplayName</DisplayName>
+    <PublisherDisplayName>Gameloft SE</PublisherDisplayName>
+    <Logo>Assets\Logo50x50\Logo50x50.png</Logo>
+  </Properties>
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.17763.0" MaxVersionTested="10.0.19041.0" />
+    <PackageDependency Name="Microsoft.UI.Xaml.2.8" MinVersion="8.2501.31001.0" Publisher="CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US" />
+    <PackageDependency Name="Microsoft.VCLibs.140.00.UWPDesktop" MinVersion="14.0.33728.0" Publisher="CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US" />
+    <PackageDependency Name="Microsoft.VCLibs.140.00" MinVersion="14.0.33519.0" Publisher="CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US" />
+    <PackageDependency Name="Microsoft.NET.Native.Framework.1.3" MinVersion="1.3.24201.0" Publisher="CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US" />
+    <PackageDependency Name="Microsoft.NET.Native.Runtime.1.4" MinVersion="1.4.24201.0" Publisher="CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US" />
+  </Dependencies>
+  <Resources>
+    <Resource Language="EN-US" />
+    <Resource uap:Scale="100" />
+    <Resource uap:Scale="200" />
+  </Resources>
+  <Applications>
+    <Application Id="App" Executable="DH5_W10.exe" EntryPoint="DungeonHunter5.App">
+      <uap:VisualElements DisplayName="ms-resource:DisplayName" Square150x150Logo="Assets\Logo150x150\Logo150x150.png" Square44x44Logo="Assets\Logo44x44\Logo44x44.png" Description="Dungeon Hunter 5" BackgroundColor="#000000">
+        <uap:DefaultTile ShortName="ms-resource:DisplayNameShort" Square310x310Logo="Assets\Logo310x310\Logo310x310.png" Wide310x150Logo="Assets\Logo310x150\Logo310x150.png" Square71x71Logo="Assets\Logo71x71\Logo71x71.png">
+          <uap:ShowNameOnTiles>
+            <uap:ShowOn Tile="square150x150Logo" />
+            <uap:ShowOn Tile="wide310x150Logo" />
+            <uap:ShowOn Tile="square310x310Logo" />
+          </uap:ShowNameOnTiles>
+        </uap:DefaultTile>
+        <uap:SplashScreen Image="Assets\SplashScreen\SplashScreen620x300.png" BackgroundColor="#000000" />
+        <uap:InitialRotationPreference>
+          <uap:Rotation Preference="landscape" />
+          <uap:Rotation Preference="landscapeFlipped" />
+        </uap:InitialRotationPreference>
+      </uap:VisualElements>
+      <uap:ApplicationContentUriRules>
+        <uap:Rule Match="https://ingameads.gameloft.com" Type="include" WindowsRuntimeAccess="none" />
+        <uap:Rule Match="https://*.gameloft.com" Type="include" WindowsRuntimeAccess="none" />
+        <uap:Rule Match="https://*.*.gameloft.com" Type="include" WindowsRuntimeAccess="none" />
+        <uap:Rule Match="https://*.*.*.gameloft.com" Type="include" WindowsRuntimeAccess="none" />
+        <uap:Rule Match="https://*.*.*.*.gameloft.com" Type="include" WindowsRuntimeAccess="none" />
+        <uap:Rule Match="https://*.*.*.*.*.gameloft.com" Type="include" WindowsRuntimeAccess="none" />
+      </uap:ApplicationContentUriRules>
+    </Application>
+  </Applications>
+  <Capabilities>
+    <Capability Name="internetClient" />
+    <Capability Name="internetClientServer" />
+    <Capability Name="privateNetworkClientServer" />
+    <DeviceCapability Name="location" />
+  </Capabilities>
+  <Extensions>
+    <Extension Category="windows.activatableClass.inProcessServer">
+      <InProcessServer>
+        <Path>InAppPurchaseComponentW10_x86.dll</Path>
+        <ActivatableClass ActivatableClassId="InAppPurchaseComponentW10.IapComponent" ThreadingModel="both" />
+      </InProcessServer>
+    </Extension>
+    <Extension Category="windows.activatableClass.inProcessServer">
+      <InProcessServer>
+        <Path>WCPToolkit.dll</Path>
+        <ActivatableClass ActivatableClassId="WCPToolkit.Utils.ZOrdering.ZOrder" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="WCPToolkit.Utils.Encryption.Encryptor" ThreadingModel="both" />
+      </InProcessServer>
+    </Extension>
+    <Extension Category="windows.activatableClass.inProcessServer">
+      <InProcessServer>
+        <Path>Microsoft.Web.WebView2.Core.dll</Path>
+        <ActivatableClass ActivatableClassId="Microsoft.Web.WebView2.Core.CoreWebView2Environment" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="Microsoft.Web.WebView2.Core.CoreWebView2Controller" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="Microsoft.Web.WebView2.Core.CoreWebView2ControllerWindowReference" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="Microsoft.Web.WebView2.Core.CoreWebView2CompositionController" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="Microsoft.Web.WebView2.Core.CoreWebView2CustomSchemeRegistration" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="Microsoft.Web.WebView2.Core.CoreWebView2EnvironmentOptions" ThreadingModel="both" />
+      </InProcessServer>
+    </Extension>
+    <Extension Category="windows.activatableClass.inProcessServer">
+      <InProcessServer>
+        <Path>A278AB0D.DungeonHunter5.dll</Path>
+        <ActivatableClass ActivatableClassId="MicrosoftGraphRuntimeComponent.MicrosoftGraphHelper" ThreadingModel="both" />
+      </InProcessServer>
+    </Extension>
+  </Extensions>
+  <build:Metadata>
+    <build:Item Name="cl.exe" Version="19.00.24247.2 built by: VCTOOLSD14ULDR" />
+    <build:Item Name="VisualStudio" Version="16.0" />
+    <build:Item Name="VisualStudioEdition" Value="Microsoft Visual Studio Community 2019" />
+    <build:Item Name="OperatingSystem" Version="10.0.26100.1 (WinBuild.160101.0800)" />
+    <build:Item Name="Microsoft.Build.AppxPackage.dll" Version="16.0.36101.45" />
+    <build:Item Name="ProjectGUID" Value="{6834b3c5-3e57-4d30-91d0-0b10aff11c34}" />
+    <build:Item Name="ilc.exe" Version="1.4.24211.07 built by: PROJECTNSVC2" />
+    <build:Item Name="OptimizingToolset" Value="ilc.exe" />
+    <build:Item Name="UseDotNetNativeSharedAssemblyFrameworkPackage" Value="True" />
+    <build:Item Name="UniversalGenericsOptOut" Value="false" />
+    <build:Item Name="Microsoft.Windows.UI.Xaml.Build.Tasks.dll" Version="10.0.19041.5609" />
+    <build:Item Name="WindowsDesktop" Version="10.0.19041.0" />
+    <build:Item Name="WindowsMobile" Version="10.0.19041.0" />
+    <build:Item Name="MakePri.exe" Version="10.0.19041.5609 (WinBuild.160101.0800)" />
+  </build:Metadata>
+</Package>

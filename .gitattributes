@@ -1,0 +1,2 @@
+# Manifests and runtime inventories use exact SHA256 checks; preserve source bytes.
+* -text

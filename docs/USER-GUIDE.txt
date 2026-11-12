@@ -1,0 +1,153 @@
+GFW8 License Grabber — GUI v1.4.7
+By Alec Breen | TheBreenis
+https://github.com/thebreenis
+
+Run the single GFW8 License Grabber.exe. It carries the bundled backend; on first launch it unpacks and verifies a private versioned runtime. Windows 10/11
+x64, Windows PowerShell 5.1 and Windows Microsoft-account SSO are required.
+No Python, developer SDK or game installation is required. The backend's
+temporary Appx registration must be allowed by Windows. This app does not
+change that setting. Installed games support receipt acquisition only.
+
+Choose a game from the 108-entry dropdown. With it focused, type multiple
+letters to jump to a matching name; there is no editable search field.
+For games not installed, Get pop.bin uses the account returned with the Windows receipt credential.
+The header displays that email when Windows provides it. Xbox gamertag is
+resolved from a successful token/profile lookup; until then it is explicitly
+unavailable, never guessed from your email or the Xbox app's visible login.
+
+Load existing receipt opens a file picker. It parses XML with DTD/external
+entities disabled, verifies the whole-document signature against the pinned
+Microsoft public certificate, checks Full edition and ReceiptDate+24 hours,
+and then automatically selects the matching game. At 24 hours the receipt is
+invalid and is not loaded. The source is never modified. No new certificate
+chain/revocation validation is claimed. App-minted receipts skip the extra
+signature-verification step as requested; edition/date are still checked.
+Saved validation records and SHA256 detect changes before token acquisition.
+
+Get Xbox token is optional. It uses the existing independent temporary helper,
+with silent sign-in first and one PromptIfNeeded recovery if Windows requires
+verification. Windows owns any credential dialog. The original attempt and
+receipt are retained. Forced credential input is not automated.
+Seven helper routes are verified locally; all 108 catalogue entries have token
+attempt configurations. Other routes remain experimental. DML uses a tested
+Windows 10 package identity with its legacy title ID. Modern Combat 5 uses its
+supplied 5.8.7.0 Windows 10 identity and SPA-confirmed legacy title ID; live token
+testing was blocked by no license. Dungeon Hunter 5 uses current Windows 10
+identity metadata and user-accepted candidate title ID 1195776868; receipt and
+token success are assumed for an entitled account, not independently proven.
+PromptIfNeeded recovery now activates the helper window for Windows sign-in.
+Token acquisition and Presence testing are available only for uninstalled games.
+
+Receipt expiry is ReceiptDate+24 hours under the requested policy. Token expiry
+comes from Xbox's actual response; Issued is its expiry-minus 4 hours reference,
+since Xbox may backdate Created. A still-valid receipt can be reused to request
+another token after token expiry, subject to service authorization.
+
+After successful token acquisition, Copy to Clipboard appears. It copies the
+complete native issued-token.xml, which is also saved to a private file.
+No raw bearer values are shown in Activity. Changing games clears the active
+receipt/token UI association but does not remove any saved files.
+
+Test Xbox Presence is optional and changes Xbox activity. It reads the token's
+profile, posts Presence, polls independent readback, and separately submits
+legacy Last Played history. Results/HTTP errors are shown separately. This
+does not establish achievement authorization or guarantee Xbox-profile UI
+propagation. Existing active presence is preserved. Temporary test presence is
+removed and absence polled when initially inactive. Cleanup uncertainty is
+reported. No achievement endpoints are called.
+
+Get every entitled pop.bin sequentially checks all 108 receipt entries. It
+creates game folders only after a valid receipt is downloaded. Unlicensed and
+failed checks stay in the batch summary log. The dropdown scrolls at half speed;
+Tab commits the highlighted game and advances focus. Bulk counts errors and
+never acquires tokens. Cancel stops between requests, preserving completed
+files. A current HTTP request can take up to 45 seconds to finish. Receipt
+entitlement coverage is not a guarantee every edition can issue a receipt.
+
+Each action replaces its button with a progress display spanning all stages without resetting. Time estimates are
+approximate duration, never a prediction of success. Windows verification pauses overall progress; long requests show Taking longer than usual instead of 0 seconds.
+
+Activity is readable, scrollable, and has independent Copy to Clipboard and
+Save Log actions. The displayed/exported log excludes bearer values, receipt
+XML and account email. Account identity travels privately to the header.
+Each distinct error is shown once per operation; a separate retry can report it
+again. Successful background installation checks do not add Activity messages.
+
+Open saved files opens:
+  %LOCALAPPDATA%\GFW8LicenseGrabber
+Per-run receipts, token exports, results and preservation backups are restricted
+to your Windows account and SYSTEM. Treat issued-token.xml/native-token.txt
+like temporary passwords. No receipts/tokens/saves/private logs are bundled.
+Backend diagnostic files can contain private paths/data; share only sanitized
+Activity logs. Save Log exports the current displayed Activity text.
+
+The GUI runs operations in hidden background workers and stays responsive.
+Closing while work is active waits for the current operation and helper cleanup;
+bulk work is cancelled between requests. Complete/cancel a Windows sign-in
+dialog to let authentication finish. Do not force-kill workers during cleanup.
+
+The CLI backend is derived from the working v0.4 build. Its existing save/pop
+preservation guards, pinned runtime hashes, original package versions and
+temporary-registration cleanup remain enabled.
+
+New output layout:
+  Games\<package_family_name>\Receipts\<UTC run>\pop.bin
+  Games\<package_family_name>\Tokens\<UTC run>\...
+  Games\<package_family_name>\Presence\<UTC run>\...
+  Batches\<UTC batch>\bulk-summary-private.json
+  Logs\Jobs\<UTC operation>\...
+  Runtime\<version-hash>\... (embedded backend cache)
+Existing saved files are retained in their original folders.
+The approved purple Windows 8 style icon is embedded in the EXE and used by the app window.
+Xbox mark source: Microsoft artwork at https://commons.wikimedia.org/wiki/File:Xbox_Logo.svg
+
+Installed games (v1.4):
+Get pop.bin requests a fresh receipt directly from the Store service, whether or
+not the game is installed. No game launch, cached-receipt refresh, installer,
+package swap or additional confirmation is needed. Normal entitlement checks apply.
+
+Token acquisition and Presence testing are disabled while the selected game is
+installed. The background worker also checks installation before authentication
+or Presence, so a stale UI selection cannot enable the removed flow. Loading a
+receipt still selects its game and observes the same installed-game restriction.
+For uninstalled games the existing token/PromptIfNeeded/expiry/copy/Presence steps
+remain available. Bulk remains receipts only and performs no package changes.
+
+Compatibility recovery only:
+If an earlier v1.3 operation was interrupted after a package change, startup still
+attempts its recorded restoration before new work. A failed restoration shows
+Retry restoration / Close app and keeps recovery files. No new transactions can
+be created. Do not delete retained PackageRecovery material while recovery remains
+unfinished. The ordinary receipt/token flow has no package-swap or installer UI.
+
+Window layout (v1.4.2):
+The default window is 60 pixels shorter. The complete interface scales uniformly
+when resized or maximized, including the game dropdown. Installed-game token
+text explains the installation conflict and asks the user to uninstall and retry.
+
+Local token-helper diagnostics (v1.4.3):
+Complete child stdout/stderr is saved to driver-metadata.log. When available,
+local-error-private.log records the underlying exception beside token-result.json.
+These files are private; share only relevant exception text.
+
+Castle Siege (v1.4.7):
+Age of Empires: Castle Siege now supports token acquisition using the recovered
+original Windows 8.1 package identity/version 1.26.2.33 and matching Xbox SDK.
+Fresh receipt, independent token and Xbox profile acceptance verified locally.
+The game must be uninstalled, as with other token-enabled titles.
+
+Recovered metadata (v1.4.7):
+Token configurations added for Castle Siege 1.26.2.33, Harvest 1.2.0.82,
+Imperia Online 6.1.8.8, Microsoft Jigsaw 1.7.1808.2102, Microsoft Solitaire
+2.11.1807.1002, Microsoft Sudoku 1.7.10190.0, Rabbids Big Bang 2.0.0.1 and
+Rayman Fiesta Run 1.1.0.5. Harvest's native family is Microsoft.TheHarvestHD.
+Castle Siege passed a live independent token and Xbox profile test. The other
+new configurations are metadata-backed attempts, not guaranteed service access.
+Existing installations remain unchanged; token acquisition stays disabled while
+the game is installed. No entitlement is created by adding a configuration.
+
+Dragon Mania Legends, Dungeon Hunter 5 and Modern Combat 5 remain receipt-only.
+Current Microsoft CDN identities were found, but the original Windows 8 PC
+packages and legacy title mappings could not be verified. Windows Phone XAPs
+and newer Windows 10 editions were not substituted. The current Modern Combat
+package's xbl.spa has a different title ID from the retained Windows 8 candidate.

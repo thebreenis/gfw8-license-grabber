@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Package IgnorableNamespaces="build" xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest" xmlns:build="http://schemas.microsoft.com/developer/appx/2012/build">
+  
+  <Identity Name="Microsoft.AgeCastles" Version="1.26.2.33" Publisher="CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US" ProcessorArchitecture="x86"/>
+  <Properties>
+    <DisplayName>Age of Empires®: Castle Siege</DisplayName>
+    <PublisherDisplayName>Microsoft Studios</PublisherDisplayName>
+    <Logo>StoreLogo.png</Logo>
+  </Properties>
+  <Prerequisites>
+    <OSMinVersion>6.3.0</OSMinVersion>
+    <OSMaxVersionTested>6.3.0</OSMaxVersionTested>
+  </Prerequisites>
+  <Resources>
+    <Resource Language="EN-US"/>
+    <Resource m2:Scale="100"/>
+    
+  </Resources>
+  <Applications>
+    <Application Id="App" Executable="CastlesClient_s.exe" EntryPoint="CastlesClient.App">
+      <m2:VisualElements DisplayName="Age of Empires®: Castle Siege" Description="Fortify your castle, build mighty armies and advance through the ages as you besiege other players to destroy their castles." BackgroundColor="#003a3c" ForegroundText="light" Square150x150Logo="Logo.png" Square30x30Logo="Square30x30Logo.png" ToastCapable="true">
+        <m2:DefaultTile ShortName="AoE: Castle Siege" DefaultSize="square150x150Logo" Wide310x150Logo="Logo-310x150.scale100.png"/>
+        <m2:InitialRotationPreference>
+          <m2:Rotation Preference="landscape"/>
+          <m2:Rotation Preference="landscapeFlipped"/>
+        </m2:InitialRotationPreference>
+        <m2:SplashScreen BackgroundColor="#000000" Image="SplashScreen.png"/>
+      </m2:VisualElements>
+      <Extensions>
+        <Extension Category="windows.protocol">
+          <Protocol Name="xboxliveapp-1297292164">
+            <DisplayName>Age of Empires®: Castle Siege</DisplayName>
+          </Protocol>
+        </Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+  <Capabilities>
+    <Capability Name="privateNetworkClientServer"/>
+    <Capability Name="internetClientServer"/>
+    <Capability Name="internetClient"/>
+  </Capabilities>
+  <Extensions>
+    <Extension Category="windows.activatableClass.proxyStub">
+      <ProxyStub ClassId="10EE0CAA-F78A-4AE6-A92C-8988E2DEDB00">
+        <Path>Microsoft.Xbox.dll</Path>
+        <Interface Name="Microsoft.Xbox.Interop.ICallbackInvoker" InterfaceId="3DBDEF74-8B05-4318-8A5C-D790039C0576"/>
+      </ProxyStub>
+    </Extension>
+    <Extension Category="windows.activatableClass.inProcessServer">
+      <InProcessServer>
+        <Path>Squire.NativeInterfaces.dll</Path>
+        <ActivatableClass ActivatableClassId="Squire_NativeInterfaces.WindowsPhoneRuntimeComponent" ThreadingModel="both"/>
+      </InProcessServer>
+    </Extension>
+    <Extension Category="windows.activatableClass.inProcessServer">
+      <InProcessServer>
+        <Path>CLRHost.dll</Path>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.WonderItemState" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.PostBattleOrdersResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.DemoteAllianceMemberResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.AlliancePlayerLeftMessage" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.WebCaller" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.LiveTuningDataInfo" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.EmpireListEntry" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetEmpireListResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.ToggleServerInitiatedMessagesRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetAllianceMembersResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.CommerceOffer" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetAllianceMessagesResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.BattleOrderWithMetadata" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.PlayerDescription" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.LeagueSeasonResultMetadata" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.FileReportRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.StartBattleRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.KickAllianceMemberRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.ForceReleaseLockResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.MatchmakingRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.FindAllianceByNameResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.AllianceLeaderboardRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.LinkAccountRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.ShareRetryBattleResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.AlliancePlayerKickedMessage" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.ListContentResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.PlayerLeaderboardResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.CancelNotificationRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetPlayerReportsResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GSCRBuildModeCommand" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.CommenceRetryBattleResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.CreateEmpireRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.Responses.ServerInitiated.PlayerKickedResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.Responses.ServerInitiated.AllianceMessagePostedResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.Responses.ServerInitiated.AcceptedInAllianceResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.Responses.ServerInitiated.EmpireReservedResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.Responses.ServerInitiated.ReliefForcesReceivedResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.Responses.ServerInitiated.AllianceMemberStatusUpdateResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.Responses.ServerInitiated.LockBrokenResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.Responses.ServerInitiated.PlayerInvitedResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.Responses.ServerInitiated.GameStateChangeRequestResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetAllianceMembersReliefForcesResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetGameStateChangeRequestQueueResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetSingleAllianceMemberMetadataResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.AllianceMemberReliefForceData" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.SendFriendAllianceInvitationRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.PromoteAllianceMemberRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetAllianceMembersReliefForcesRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.AlliancePlayerJoinedMessage" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.FinishBattleRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetEmpireResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetFriendAllianceRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.StartWonderItemConstructionRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.DeleteEmpireResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.AllianceCreationMetadata" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetAllianceResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.FindAllianceByNameRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.Json.ExceptionJson" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.Json.LogEntryJson" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.WebCallState" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.KickAllianceMemberResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetGameStateChangeRequestQueueRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.AllianceMetadata" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.ShareReplayResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.AllianceNewsMessage" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.DebugDigestResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.EmptyResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.ScheduleNotificationRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.MatchmakingScalingValues" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.StartAllianceRetryBattleRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetMyLeagueInfoResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.DemoteAllianceMemberRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.DeleteEmpireResult" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.ShareReplayRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.PostBuildOrderResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.DeleteAllianceMessageResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.LeaveAllianceRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.TransactionHistoryEntry" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetAllianceRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.ResponseEnvelope" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.StartAllianceRetryBattleResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.PlayerLeagueData" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetAllianceMembersRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.RedeemedConsumableProductReceipt" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.DeclineJoinAllianceRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetGameCenterFriendAllianceRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.SendAllianceInvitationRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.CastlesInsecureToken" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.PostBattleOrdersRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.ScheduleNotificationResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.UpdateAllianceRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.UpdateAllianceResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetMyAllianceInvitationsRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.AllianceStartWonderItemConstructionMessage" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.AllianceInvitationMetadata" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.ServiceClientUtility" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.PostBuildOrderRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.AllianceMetadataUpdatedMessage" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.SocketCallState" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.AllianceRequestTroopsMessage" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetAccountLinkStatusRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.AlliancePlayerDemotedMessage" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.TakeRevengeRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.AllianceReliefForcesDonatedMessage" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.SendAllianceMessageResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetReliefForcesResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.DebugDigestRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.PromoteAllianceMemberResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.PlayerLeaderboardEntry" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetMyAllianceRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.ReplayData" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.SquireDebug" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.ServerConfigListEntry" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.LeaveAllianceResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.StartWonderItemConstructionResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.DeleteAllianceMessageRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.ClientOnly.NotificationHelper" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.AllianceLeaderboardEntry" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.AllianceSharedRetryBattleMessage" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.AddOrUpdateContentResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetServerConfigResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.PlayerLimitedOfferData" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.DeclineAllianceInvitationResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.BattleStateDumpRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.CommenceRetryBattleRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.DeclineAllianceInvitationRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.RedeemReceiptResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.ServerConfigInfo" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetPlayerAllianceResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.SendAllianceMessageRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.AllianceChatMessage" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.SendAllianceInvitationResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.FindPlayerByNameRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetAllianceInvitationsResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.PlayerSearchResult" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.AllianceSharedReplayMessage" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.VisitGameCenterFriendEmpireRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.MatchmakingMaxDefenderLevelPerLoss" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.ShareRetryBattleRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetSingleAllianceMemberMetadataRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.StartBattleResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.FinishBattleResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.VisitFriendEmpireRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.PlayerReportingEntry" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.PlayerReport" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.AcceptJoinAllianceRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.AllianceLeaderboardResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.WinRtWebSocketImplementation" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.CreateAllianceRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetPlayerCreditsResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.FileReportResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.WonderState" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.CallerCore" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetReliefForcesRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.PlayerLeaderboardRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetMyLeagueInfoRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.DebugDigest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetWonderStateRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetLockStatusResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetWonderStateResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetEmpireRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.SharedReplay" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.MatchmakingResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.AllianceMemberStats" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.ServiceVersionResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.RedeemReceiptRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.LinkAccountResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.CreateAllianceResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.MessageOfTheDay" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.BattleStateDumpResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.AlliancePlayerJoinRequestMessage" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetAccountLinkStatusResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.DeleteEmpireByXuidResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.FindPlayerByNameResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.RequestEnvelope" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.AllianceAdminMessage" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetTopCrownsResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetAllianceMemberStatsResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.FindAllianceByFilterRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.AlliancePlayerInvitedMessage" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.AlliancePlayerPromotedMessage" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.JoinAllianceRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.JoinAllianceResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.AcceptJoinAllianceResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.ReliefForceUnit" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.Match" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.AllianceMemberMetadata" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.SendGameCenterFriendAllianceInvitationRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.SocketCaller" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.DeclineJoinAllianceResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.CancelNotificationResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.BuildOrder" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetTransactionHistoryResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.TakeRevengeResponse" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.GetAllianceMessagesRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Squire.ClientShared.SetEmpireRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="FlurryWin8SDK.Models.Parameter" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="FlurryWin8SDK.Api" ThreadingModel="both"/>
+      </InProcessServer>
+    </Extension>
+    <Extension Category="windows.activatableClass.inProcessServer">
+      <InProcessServer>
+        <Path>Microsoft.Xbox.dll</Path>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Recipient" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Multiplayer.MatchmakingService" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Multiplayer.MatchRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Multiplayer.MatchCriteria" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Multiplayer.MultiplayerSession" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Multiplayer.MultiplayerSessionSettings" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Multiplayer.MatchProperty" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.XboxLIVEService" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Leaderboards.LeaderboardAttribute" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Leaderboards.LeaderboardService" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.UserMessage" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.TitleStorage.TitleStorageService" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.TitleStorage.TitleStorageFile" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Marketplace.AssetBalance" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Marketplace.MarketplaceService" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.User" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Foundation.ServiceClient" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Foundation.PushNotificationManager" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Foundation.UserIdentity" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.ResourceLoader" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.UserCollection" ThreadingModel="both"/>
+      </InProcessServer>
+    </Extension>
+  </Extensions>
+  <Dependencies>
+    <PackageDependency Name="Microsoft.VCLibs.120.00" MinVersion="12.0.21005.1"/>
+  </Dependencies>
+  <build:Metadata>
+    <build:Item Name="cl.exe" Version="18.00.40629.0 built by: REL"/>
+    <build:Item Name="VisualStudio" Version="12.0"/>
+    <build:Item Name="OperatingSystem" Version="10.0.17134.1 (WinBuild.160101.0800)"/>
+    <build:Item Name="Microsoft.Build.AppxPackage.dll" Version="12.0.31101.0"/>
+    <build:Item Name="ProjectGUID" Value="{7AD23764-ECD6-41CD-BAAF-3D26563B12CB}"/>
+    <build:Item Name="Microsoft.Windows.UI.Xaml.Build.Tasks.dll" Version="12.0.30501.0"/>
+    <build:Item Name="Xbox LIVE SDK for Windows 8.1" Version="2.0"/>
+    <build:Item Name="MakePri.exe" Version="6.3.9600.17336 (winblue.150226-1500)"/>
+  </build:Metadata>
+</Package>

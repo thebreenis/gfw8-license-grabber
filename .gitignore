@@ -1,0 +1,14 @@
+/build/
+/dist/
+__pycache__/
+*.pyc
+*.obj
+*.pdb
+*.log
+pop.bin
+issued-token.xml
+native-token.txt
+*-private.json
+*-private.txt
+registration.lock
+/backend/runtime/jetpack-auth-investigation/shared-auth-helper/AppxManifest.xml

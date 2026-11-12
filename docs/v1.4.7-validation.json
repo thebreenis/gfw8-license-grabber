@@ -1,0 +1,90 @@
+{
+  "application": "GFW8 License Grabber",
+  "version": "1.4.7",
+  "validatedUtc": "2026-11-12T15:50:21.149344+00:00",
+  "change": "Small version label at bottom right, after Open saved files; label generated from Launcher runtime version to avoid mismatches.",
+  "checks": {
+    "footer": {
+      "versionLabel": "v1.4.7",
+      "layouts": [
+        {
+          "label": "v1.4.7",
+          "unclipped": true,
+          "width": 1320,
+          "separateFromButton": true,
+          "height": 750
+        },
+        {
+          "label": "v1.4.7",
+          "unclipped": true,
+          "width": 1920,
+          "separateFromButton": true,
+          "height": 1040
+        },
+        {
+          "label": "v1.4.7",
+          "unclipped": true,
+          "width": 1120,
+          "separateFromButton": true,
+          "height": 636
+        }
+      ],
+      "checksPassed": 4,
+      "liveNetworkCalls": 0
+    },
+    "layout": {
+      "checksPassed": 12,
+      "defaultHeight": 750,
+      "previousHeight": 810,
+      "layouts": [
+        {
+          "messageHeight": 56,
+          "gapAboveTokenButton": 41.60000000000002,
+          "width": 1320,
+          "uniformScale": 1,
+          "height": 750
+        },
+        {
+          "messageHeight": 56,
+          "gapAboveTokenButton": 41.60000000000002,
+          "width": 1920,
+          "uniformScale": 1.3859275053304905,
+          "height": 1040
+        },
+        {
+          "messageHeight": 56,
+          "gapAboveTokenButton": 41.60000000000002,
+          "width": 1120,
+          "uniformScale": 0.847547974413646,
+          "height": 636
+        }
+      ],
+      "requestedTextExact": true,
+      "liveNetworkCalls": 0,
+      "packageChanges": 0
+    },
+    "embeddedSignedImport": {
+      "embeddedBundleVerified": true,
+      "embeddedWorkerSignedReceiptImport": true,
+      "gameId": 44,
+      "outputUsesExactFamilyName": true,
+      "privateRuntimePermissions": true,
+      "unwantedWarningRemoved": true,
+      "liveTokenOrPresenceRequests": 0,
+      "singleExeLaunchedWithoutAdjacentFiles": true
+    },
+    "embeddedBundleVerified": true,
+    "payloadCrcVerified": true
+  },
+  "backendUnchangedFrom": "1.4.6",
+  "previousBackendValidation": "GFW8-License-Grabber-v1.4.6-Validation.json",
+  "coverage": {
+    "receiptEntries": 108,
+    "tokenConfigurations": 108,
+    "liveVerifiedRoutes": 7
+  },
+  "testImportFixtureArchivedOutOfGames": true,
+  "liveNetworkCalls": 0,
+  "gameOrPackageChanges": 0,
+  "executableSha256": "ea607b96efe6dfadb5d48270e212dd774f8c235702322710a4d3c4c3481a18fc"
+}

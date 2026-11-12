@@ -1,0 +1,32 @@
+"""Offline source/package checks. Does not use account credentials or network."""
+from pathlib import Path
+import hashlib
+import importlib.util
+import json
+import re
+import zipfile
+
+ROOT = Path(__file__).resolve().parents[1]
+spec = importlib.util.spec_from_file_location('project_build', ROOT / 'tools/build.py')
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+module.validate_routes()
+version = (ROOT / 'VERSION').read_text().strip()
+assert re.fullmatch(r'\d+\.\d+\.\d+', version)
+for folder in ('src', 'backend', 'tools', 'tests', 'docs'):
+    for path in (ROOT / folder).rglob('*'):
+        if not path.is_file() or '__pycache__' in path.parts:
+            continue
+        assert path.name.lower() not in ('pop.bin', 'issued-token.xml', 'native-token.txt', 'request-private.json', 'registration.lock', 'appxmanifest.xml')
+        if path.suffix.lower() in ('.ps1', '.cs', '.cpp', '.py', '.json', '.txt', '.xml', '.md', '.cmd'):
+            text = path.read_text(encoding='utf-8-sig')
+            assert not re.search(r'[A-Za-z]:[/\\]Users[/\\][^/\\\s]+[/\\]', text), str(path)
+            assert not re.search(r'(?:gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|-----BEGIN (?:RSA )?PRIVATE KEY-----)', text), str(path)
+payload = ROOT / 'build/gui-payload.zip'
+if payload.exists():
+    with zipfile.ZipFile(payload) as archive:
+        assert archive.testzip() is None
+        assert len(json.loads(archive.read('backend/games.json').decode('utf-8-sig'))['games']) == 108
+        assert f'Text="v{version}"' in archive.read('MainWindow.xaml').decode()
+        assert not any(Path(name).name.lower() in ('pop.bin', 'issued-token.xml', 'native-token.txt', 'registration.lock', 'appxmanifest.xml') for name in archive.namelist())
+print('PASS: 108 routes, manifest provenance, dependency hashes, version, package CRC and private-artifact exclusions.')

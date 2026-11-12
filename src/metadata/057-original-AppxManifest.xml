@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Package IgnorableNamespaces="build" xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest" xmlns:build="http://schemas.microsoft.com/developer/appx/2012/build">
+  
+  <Identity Name="Microsoft.MicrosoftJigsaw" Publisher="CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US" Version="1.7.1808.2102" ProcessorArchitecture="x86"/>
+  <Properties>
+    <DisplayName>Microsoft Jigsaw</DisplayName>
+    <PublisherDisplayName>Microsoft Studios</PublisherDisplayName>
+    <Logo>Content\ApplicationAssets\StoreLogo.png</Logo>
+  </Properties>
+  <Prerequisites>
+    <OSMinVersion>6.3.0</OSMinVersion>
+    <OSMaxVersionTested>6.3.0</OSMaxVersionTested>
+  </Prerequisites>
+  <Resources>
+    <Resource Language="EN-US"/>
+    <Resource m2:Scale="100"/>
+    
+  </Resources>
+  <Applications>
+    <Application Id="App" Executable="Jigsaw.exe" EntryPoint="Jigsaw.App">
+      <Extensions>
+        <Extension Category="windows.protocol">
+          <Protocol Name="xboxliveapp-1297292166"/>
+        </Extension>
+        <Extension Category="windows.fileTypeAssociation">
+          <FileTypeAssociation Name="jigsawpuzzle8">
+            <DisplayName>Jigsaw Puzzle</DisplayName>
+            <InfoTip>Jigsaw Puzzle</InfoTip>
+            <SupportedFileTypes>
+              <FileType ContentType="application/x-compressed">.jigsawpuzzle8</FileType>
+              <FileType ContentType="text/html">.html</FileType>
+            </SupportedFileTypes>
+          </FileTypeAssociation>
+        </Extension>
+        <Extension Category="windows.backgroundTasks" EntryPoint="CEServices.InternalLiveTileUpdaterRuntime">
+          <BackgroundTasks>
+            <Task Type="systemEvent"/>
+          </BackgroundTasks>
+        </Extension>
+      </Extensions>
+      <m2:VisualElements DisplayName="ms-resource:AppDisplayName" Description="Microsoft Jigsaw" BackgroundColor="#522430" ForegroundText="light" ToastCapable="true" Square150x150Logo="Content\ApplicationAssets\Logo.png" Square30x30Logo="Content\ApplicationAssets\SmallLogo.png">
+        <m2:DefaultTile ShortName="Microsoft Jigsaw" Wide310x150Logo="Content\ApplicationAssets\WideLogo.png" Square310x310Logo="Content\ApplicationAssets\BigSquare.png" DefaultSize="wide310x150Logo" Square70x70Logo="Content\ApplicationAssets\Square70x70Logo.png"/>
+        <m2:InitialRotationPreference>
+          <m2:Rotation Preference="portrait"/>
+          <m2:Rotation Preference="landscape"/>
+          <m2:Rotation Preference="portraitFlipped"/>
+          <m2:Rotation Preference="landscapeFlipped"/>
+        </m2:InitialRotationPreference>
+        <m2:ApplicationView MinWidth="width500"/>
+        <m2:SplashScreen BackgroundColor="#522430" Image="Content\ApplicationAssets\SplashScreen.png"/>
+      </m2:VisualElements>
+    </Application>
+  </Applications>
+  <Capabilities>
+    <Capability Name="privateNetworkClientServer"/>
+    <Capability Name="internetClient"/>
+    <DeviceCapability Name="webcam"/>
+  </Capabilities>
+  <Extensions>
+    <Extension Category="windows.activatableClass.proxyStub">
+      <ProxyStub ClassId="10EE0CAA-F78A-4AE6-A92C-8988E2DEDB00">
+        <Path>Microsoft.Xbox.dll</Path>
+        <Interface Name="Microsoft.Xbox.Interop.ICallbackInvoker" InterfaceId="3DBDEF74-8B05-4318-8A5C-D790039C0576"/>
+      </ProxyStub>
+    </Extension>
+    <Extension Category="windows.activatableClass.inProcessServer">
+      <InProcessServer>
+        <Path>Arkadium.SharpDXEngine.AudioLoader.dll</Path>
+        <ActivatableClass ActivatableClassId="Arkadium.SharpDXEngine.AudioLoader.AudioWrapper" ThreadingModel="both"/>
+      </InProcessServer>
+    </Extension>
+    <Extension Category="windows.activatableClass.inProcessServer">
+      <InProcessServer>
+        <Path>Microsoft.Advertising.dll</Path>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Shared.WinRT.PlatformDependency" ThreadingModel="STA"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Shared.WinRT.AdTagCollection" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Shared.WinRT.ProjectedMediaConstraints" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Shared.WinRT.AdScheduler" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Shared.WinRT.SdkInfoProvider" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Shared.WinRT.AdExtension" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Shared.WinRT.Advertisement" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Shared.WinRT.ProjectedContext" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Shared.WinRT.AdPlacement" ThreadingModel="STA"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Shared.WinRT.AdErrorEventArgs" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.WinRT.UI.NativeImage" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.WinRT.UI.ManipulationStateChangedEventArgs" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.WinRT.UI.ExpandProperties" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.WinRT.UI.InterstitialAd" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.WinRT.UI.NativeAdPublisherContext" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.WinRT.UI.AdControl" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Ads.Requests.AdBroker.Data" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Ads.Requests.AdBroker.Publisher" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Ads.Requests.AdBroker.OpenRTBRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Ads.Requests.AdBroker.UserExtension" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Ads.Requests.AdBroker.NativeWrapperRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Ads.Requests.AdBroker.NativeVideo" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Ads.Requests.AdBroker.Device" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Ads.Requests.AdBroker.NativeWrapper" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Ads.Requests.AdBroker.Native" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Ads.Requests.AdBroker.Image" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Ads.Requests.AdBroker.DeviceExtension" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Ads.Requests.AdBroker.Impression" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Ads.Requests.AdBroker.PublisherExtension" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Ads.Requests.AdBroker.Title" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Ads.Requests.AdBroker.Utils" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Ads.Requests.AdBroker.Asset" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Ads.Requests.AdBroker.User" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Advertising.Ads.Requests.AdBroker.Application" ThreadingModel="both"/>
+      </InProcessServer>
+    </Extension>
+    <Extension Category="windows.activatableClass.inProcessServer">
+      <InProcessServer>
+        <Path>Microsoft.Xbox.dll</Path>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.TitleStorage.TitleStorageFile" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.TitleStorage.TitleStorageService" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Marketplace.MarketplaceService" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Marketplace.AssetBalance" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.UserMessage" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Leaderboards.LeaderboardService" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Leaderboards.LeaderboardAttribute" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Foundation.UserIdentity" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Foundation.ServiceClient" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Foundation.PushNotificationManager" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Multiplayer.MultiplayerSession" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Multiplayer.MatchProperty" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Multiplayer.MatchRequest" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Multiplayer.MatchCriteria" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Multiplayer.MultiplayerSessionSettings" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Multiplayer.MatchmakingService" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.Recipient" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.ResourceLoader" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.XboxLIVEService" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.User" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Xbox.UserCollection" ThreadingModel="both"/>
+      </InProcessServer>
+    </Extension>
+    <Extension Category="windows.activatableClass.inProcessServer">
+      <InProcessServer>
+        <Path>Microsoft.Applications.Telemetry.Windows.dll</Path>
+        <ActivatableClass ActivatableClassId="Microsoft.Applications.Telemetry.Windows.LogConfiguration" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Applications.Telemetry.Windows.PageActionData" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Applications.Telemetry.Windows.ECSClient" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Applications.Telemetry.Windows.AggregatedMetricData" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Applications.Telemetry.Windows.LogManager" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="Microsoft.Applications.Telemetry.Windows.EventProperties" ThreadingModel="both"/>
+      </InProcessServer>
+    </Extension>
+    <Extension Category="windows.activatableClass.inProcessServer">
+      <InProcessServer>
+        <Path>CLRHost.dll</Path>
+        <ActivatableClass ActivatableClassId="VungleSDK.AdViewEventArgs" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="VungleSDK.DiagnosticLogEvent" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="VungleSDK.AdPlacementConfig" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="VungleSDK.UI.VungleAdControl" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="VungleSDK.AdEndEventArgs" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="VungleSDK.ConfigEventArgs" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="VungleSDK.VungleSDKConfig" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="VungleSDK.AdEventArgs" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="VungleSDK.AdConfig" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="VungleSDK.AdFactory" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="VungleSDK.AdPlayableEventArgs" ThreadingModel="both"/>
+        <ActivatableClass ActivatableClassId="comScore.Analytics" ThreadingModel="both"/>
+      </InProcessServer>
+    </Extension>
+  </Extensions>
+  <Dependencies>
+    <PackageDependency Name="Microsoft.VCLibs.120.00" MinVersion="12.0.21005.1"/>
+  </Dependencies>
+  <build:Metadata>
+    <build:Item Name="TargetFrameworkMoniker" Value=".NETCore,Version=v4.5.1"/>
+    <build:Item Name="VisualStudio" Version="14.0"/>
+    <build:Item Name="OperatingSystem" Version="10.0.17134.1 (WinBuild.160101.0800)"/>
+    <build:Item Name="Microsoft.Build.AppxPackage.dll" Version="14.0.25431.1"/>
+    <build:Item Name="ProjectGUID" Value="{E1AB1D26-5B4B-4B11-99E0-C925625B4793}"/>
+    <build:Item Name="Microsoft.Windows.UI.Xaml.81.Build.Tasks.dll" Version="14.0.22705.1"/>
+    <build:Item Name="MakePri.exe" Version="6.3.9600.17336 (winblue.150226-1500)"/>
+  </build:Metadata>
+</Package>
