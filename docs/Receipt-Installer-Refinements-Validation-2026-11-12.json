@@ -1,0 +1,50 @@
+{
+  "date": "2026-11-12",
+  "guiVersion": "1.7.1",
+  "cliVersion": "1.3.1",
+  "features": {
+    "paddedMainButtons": true,
+    "sharedMetroChromeOnBothSubscreens": true,
+    "sharingHeadingIconRemoved": true,
+    "subscreenCreditsRemoved": true,
+    "sharingFooter": "Your Xbox, Windows, and Microsoft Account credentials are never shared.",
+    "automaticFolderPicker": false,
+    "modernFolderPickerWithAddressBar": true,
+    "archiveFormats": [
+      "ZIP",
+      "7z"
+    ],
+    "bundledReader": "7-Zip Extra 26.06 x64; SHA256 verified; license and source included",
+    "backupsCreated": false,
+    "existingReceiptsReplaced": true
+  },
+  "validation": {
+    "isolatedFolderZipSevenZipInstallerTestsPassed": true,
+    "replacementWithoutBackupsChecked": true,
+    "cliOfflineChecksPassed": 26,
+    "bundleAndPrivacyChecksPassed": true,
+    "modernFolderBrowserAndSelectionObserved": true,
+    "initialInstallerHasNoAutomaticDialogObserved": true,
+    "paddedMainButtonsAndBothSubscreensVisuallyInspected": true,
+    "realSevenZipScanOnly": {
+      "receipts": 122,
+      "games": 61,
+      "duplicates": 61,
+      "rejected": 0
+    },
+    "actualGameFolderInstallsPerformed": 0,
+    "microsoftRequests": 0,
+    "githubPushed": false,
+    "relayRedeployed": false
+  },
+  "artifacts": [
+    {
+      "name": "GFW8 License Grabber.exe",
+      "sha256": "930fe8b43cee67cd59bb62a3a391d25d6af4848f89db8d40a4266ff8730f664a"
+    },
+    {
+      "name": "GFW8LG-CLI.exe",
+      "sha256": "f36b4fcf328db37612c238d14ddb85ca878d36bcda7a09085f58577b60401f2f"
+    }
+  ]
+}

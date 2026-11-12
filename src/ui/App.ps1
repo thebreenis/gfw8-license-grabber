@@ -3,6 +3,7 @@ $ErrorActionPreference='Stop'
 $appRoot=$PSScriptRoot
 if($PSVersionTable.PSEdition -ne 'Desktop' -or ![Environment]::Is64BitProcess){throw 'Use GFW8 License Grabber.exe with Windows PowerShell 5.1 x64.'}
 Add-Type -AssemblyName PresentationFramework,PresentationCore,WindowsBase
+Add-Type -Path (Join-Path $appRoot 'Sharing.dll')
 . "$appRoot\backend\Core.ps1"
 . "$appRoot\GuiBackend.ps1"
 . "$appRoot\InstalledGames.ps1"
@@ -13,7 +14,7 @@ Add-Type -Path (Join-Path $appRoot 'WindowBounds.cs') -ReferencedAssemblies @([W
 [Gfw8WindowBounds]::Install($window)
 $window.Icon=[Windows.Media.Imaging.BitmapFrame]::Create([Uri](Join-Path $appRoot 'App.ico'))
 $script:ui=@{}
-foreach($name in @('TitleDrag','Minimize','Maximize','Close','GamePicker','AccountEmail','AccountGamertag','ReceiptStatus','ReceiptDetail','ReceiptMinted','ReceiptExpires','ReceiptButton','LoadButton','ReceiptBusy','ReceiptProgress','ReceiptProgressText','ReceiptEta','TokenStatus','TokenDetail','TokenIssued','TokenExpires','TokenButton','TokenBusy','TokenProgress','TokenProgressText','TokenEta','CopyToken','PresenceStatus','PresenceDetail','PresenceButton','PresenceBusy','PresenceProgress','PresenceProgressText','PresenceEta','BulkButton','BulkBusy','BulkProgress','BulkProgressText','BulkSummary','CancelBulk','Activity','CopyLog','SaveLog','GitHub','OpenFiles')){$script:ui[$name]=$window.FindName($name)}
+foreach($name in @('TitleDrag','Minimize','Maximize','Close','GamePicker','AccountEmail','AccountGamertag','ReceiptStatus','ReceiptDetail','ReceiptMinted','ReceiptExpires','ReceiptButton','LoadButton','ReceiptBusy','ReceiptProgress','ReceiptProgressText','ReceiptEta','TokenStatus','TokenDetail','TokenIssued','TokenExpires','TokenButton','TokenBusy','TokenProgress','TokenProgressText','TokenEta','CopyToken','PresenceStatus','PresenceDetail','PresenceButton','PresenceBusy','PresenceProgress','PresenceProgressText','PresenceEta','BulkButton','BulkBusy','BulkProgress','BulkProgressText','BulkSummary','CancelBulk','Activity','CopyLog','SaveLog','GitHub','OpenFiles','Sharing','Installer')){$script:ui[$name]=$window.FindName($name)}
 foreach($name in @('AppScale','MainContent','RecoveryOverlay','RecoveryTitle','RecoveryMessage','RecoveryDetail','RecoveryOpen','RecoveryCancel','RecoveryWaiting','RecoveryProgress','RecoveryProgressLabel')){$script:ui[$name]=$window.FindName($name)}
 . "$appRoot\LegacyRecoveryUi.ps1"
 $script:games=@((Get-Content "$appRoot\backend\games.json" -Raw|ConvertFrom-Json).games)
@@ -47,7 +48,11 @@ function Update-Controls {
  $ui.TokenButton.IsEnabled=(!$busy -and $receiptGood -and $null -ne $game -and $game.tokenAttemptAvailable -and $state.availabilityKnown -and !$state.installed)
  $ui.TokenButton.ToolTip=if($state.installed){'The selected game''s installation interferes with GFW8LG''s ability to grab the token. Please uninstall the selected game and try again.'}else{$null}
  $ui.PresenceButton.IsEnabled=(!$busy -and $tokenGood -and $state.availabilityKnown -and !$state.installed)
- $ui.BulkButton.IsEnabled=!$busy
+ $scanNext=Get-FullReceiptScanNext
+ $ui.BulkButton.IsEnabled=(!$busy -and [DateTimeOffset]::UtcNow -ge $scanNext)
+ $ui.BulkButton.ToolTip=if([DateTimeOffset]::UtcNow -lt $scanNext){'Bulk and Scan My Licenses share a cooldown. Next full scan after '+$scanNext.ToLocalTime().ToString('t')}else{'Downloads and saves receipts for entitled games. Shares the 15-minute cooldown with Scan My Licenses.'}
+ $ui.Sharing.IsEnabled=!$busy
+ $ui.Installer.IsEnabled=!$busy
  Set-Visible $ui.CopyToken ($tokenGood -and (!$busy -or $state.job.action -ne 'token'))
  if($state.receipt -and !$receiptGood){$ui.ReceiptStatus.Text='Receipt expired';$ui.ReceiptDetail.Text='Get a new pop.bin to mint more tokens.'}
  if($state.token -and !$tokenGood){$ui.TokenStatus.Text='Token expired';$ui.TokenDetail.Text='Use a valid receipt to request another.'}
@@ -105,6 +110,23 @@ function Start-Operation([string]$Action,$Extra){
  if($Action -eq 'bulk'){$ui.BulkSummary.Text='Starting entitlement checks…';$ui.CancelBulk.IsEnabled=$true;$ui.BulkProgress.Value=0}
  Add-Activity ($(switch($Action){'account'{'Reading Windows account.'}'receipt'{'Requesting a receipt for '+$ui.GamePicker.SelectedItem.name+'.'}'packageRecovery'{'Retrying original package restoration.'}'load'{'Loading the selected receipt.'}'token'{'Requesting a token for '+$ui.GamePicker.SelectedItem.name+'.'}'presence'{'Starting the selected token Presence test.'}'bulk'{'Checking all 108 receipt entitlements.'}}))
  Update-Controls
+}
+function Set-ReceiptView($data,[bool]$Select=$true){
+     $state.installed=[bool]$data.installed;$state.availabilityKnown=$true
+     $receipt=$data.receipt
+     if($Select){
+      $state.applyingSelection=$true
+      $ui.GamePicker.SelectedItem=$games|Where-Object index -eq ([int]$receipt.gameId)
+      $state.applyingSelection=$false
+     }
+     # A different receipt invalidates the GUI's token association, never the saved token files.
+     $state.receipt=$receipt;$state.token=$null
+     $ui.ReceiptStatus.Text=if($receipt.origin -eq 'loaded'){'Receipt loaded'}else{'Receipt saved'}
+     $ui.ReceiptDetail.Text='pop.bin · Full license'
+     $ui.ReceiptMinted.Text=Short-Time $receipt.mintedUtc;$ui.ReceiptExpires.Text=Short-Time $receipt.expiresUtc
+     $ui.TokenStatus.Text='No token yet';$ui.TokenIssued.Text='—';$ui.TokenExpires.Text='—'
+     $ui.TokenDetail.Text=if($state.installed){'The selected game''s installation interferes with GFW8LG''s ability to grab the token. Please uninstall the selected game and try again.'}elseif($ui.GamePicker.SelectedItem.tokenAttemptAvailable){'Use this receipt to mint a token.'}else{'Token metadata unavailable for this title.'}
+     $ui.PresenceStatus.Text='Ready after token';Set-InstallationStatus
 }
 function Apply-Event($Event){
  switch($Event.kind){
@@ -181,25 +203,7 @@ function Complete-Operation {
     'account' {$state.pendingInstalledScan=[int]$ui.GamePicker.SelectedItem.index;$state.scanDue=[DateTime]::UtcNow}
     'packageRecovery' {$state.pendingRestore=$false;Hide-ReceiptRecovery;$state.pendingInstalledScan=[int]$ui.GamePicker.SelectedItem.index;$state.scanDue=[DateTime]::UtcNow}
     'availability' {if($job.gameId -eq [int]$ui.GamePicker.SelectedItem.index){$state.installed=[bool]$data.installed;$state.availabilityKnown=$true;Set-InstallationStatus}}
-    {$_ -in @('receipt','load')} {
-     $state.installed=[bool]$data.installed;$state.availabilityKnown=$true
-     if($data.cancelled){Hide-ReceiptRecovery;break}
-     if(!$data.receipt){break}
-     $receipt=$data.receipt
-     if($job.action -eq 'load'){
-      $state.applyingSelection=$true
-      $ui.GamePicker.SelectedItem=$games|Where-Object index -eq ([int]$receipt.gameId)
-      $state.applyingSelection=$false
-     }
-     # A different receipt invalidates the GUI's token association, never the saved token files.
-     $state.receipt=$receipt;$state.token=$null
-     $ui.ReceiptStatus.Text=if($receipt.origin -eq 'loaded'){'Receipt loaded'}else{'Receipt saved'}
-     $ui.ReceiptDetail.Text='pop.bin · Full license'
-     $ui.ReceiptMinted.Text=Short-Time $receipt.mintedUtc;$ui.ReceiptExpires.Text=Short-Time $receipt.expiresUtc
-     $ui.TokenStatus.Text='No token yet';$ui.TokenIssued.Text='—';$ui.TokenExpires.Text='—'
-     $ui.TokenDetail.Text=if($state.installed){'The selected game''s installation interferes with GFW8LG''s ability to grab the token. Please uninstall the selected game and try again.'}elseif($ui.GamePicker.SelectedItem.tokenAttemptAvailable){'Use this receipt to mint a token.'}else{'Token metadata unavailable for this title.'}
-     $ui.PresenceStatus.Text='Ready after token';Set-InstallationStatus
-    }
+    {$_ -in @('receipt','load')} {if($data.cancelled){Hide-ReceiptRecovery}elseif($data.receipt){Set-ReceiptView $data ($job.action -eq 'load')}}
     'token' {
      $state.token=$data.token;$ui.TokenStatus.Text='Token acquired'
      if(!$data.token.gamertag){$ui.AccountGamertag.Text='Xbox profile: lookup unavailable'}
@@ -278,6 +282,16 @@ $ui.SaveLog.add_Click({
  $dialog.Title='Save activity log';$dialog.Filter='Text log (*.txt)|*.txt';$dialog.FileName='GFW8-License-Grabber-'+[DateTime]::Now.ToString('yyyyMMdd-HHmmss')+'.txt';$dialog.OverwritePrompt=$true
  if($dialog.ShowDialog($window)){try{[IO.File]::WriteAllLines($dialog.FileName,$state.logLines,(New-Object Text.UTF8Encoding($false)));Add-Activity 'Activity log saved.'}catch{Add-Activity 'Could not save activity log.' 'error'}}
 })
+$ui.Installer.add_Click({
+ try{$window.IsEnabled=$false;[Gfw8Sharing.ReceiptInstallerWindow]::Show($appRoot);Add-Activity 'Receipt installer closed. See ReceiptInstaller in saved files for backups and results.'}catch{Add-Activity $_.Exception.Message 'error'}finally{$window.IsEnabled=$true;Update-Controls}
+})
+$ui.Sharing.add_Click({
+ try{
+  $window.IsEnabled=$false
+  $received=[Gfw8Sharing.SharingWindow]::Show($appRoot)
+  if($received){Set-ReceiptView ($received|ConvertFrom-Json);Add-Activity 'Shared receipt signature verified and saved.';Update-Controls}
+ }catch{Add-Activity $_.Exception.Message 'error'}finally{$window.IsEnabled=$true;Update-Controls}
+})
 $ui.OpenFiles.add_Click({[Diagnostics.Process]::Start('explorer.exe','"'+$script:DataRoot+'"')|Out-Null})
 $ui.GitHub.add_Click({[Diagnostics.Process]::Start('https://github.com/thebreenis')|Out-Null})
 $ui.Minimize.add_Click({$window.WindowState='Minimized'})
@@ -305,7 +319,7 @@ $window.add_ContentRendered({
   $ui.AccountEmail.Text='player@example.com';$ui.AccountGamertag.Text='Xbox profile: PlayerOne'
   Add-Activity 'Layout test — no account or network request made.'
   if($LayoutReceiptPath){Start-Operation 'load' @{path=$LayoutReceiptPath}}
- }else{Start-Operation 'account' $null}
+ }else{[Gfw8Sharing.ShareClient]::AutoStartAsync($appRoot);Start-Operation 'account' $null}
 })
 try{$null=$window.ShowDialog()}finally{$timer.Stop()}
 

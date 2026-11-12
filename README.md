@@ -8,9 +8,9 @@ By **Alec Breen | TheBreenis**.
 
 *App preview with example account details.*
 
-Download **GFW8 License Grabber.exe** from [Releases](https://github.com/thebreenis/gfw8-license-grabber/releases/latest). The single executable includes its backend; no adjacent files or Python installation are needed to run it. Current version: **1.4.7**.
+Download **GFW8 License Grabber.exe** from [Releases](https://github.com/thebreenis/gfw8-license-grabber/releases/latest). The single executable includes its backend; no adjacent files or Python installation are needed to run it. Current versions: **GUI 1.9.0 / CLI 1.5.0**, including receipt sharing; see the [sharing guide](docs/SHARING.md).
 
-Prefer CMD? Download the separate **[GFW8LG-CLI.exe v1.0.2](https://github.com/thebreenis/gfw8-license-grabber/releases/tag/cli-v1.0.2)**. It offers a cyan/purple/green interactive menu, the same 108-game backend and safeguards, and scriptable commands:
+Prefer CMD? Download the separate **[GFW8LG-CLI.exe v1.5.0](https://github.com/thebreenis/gfw8-license-grabber/releases/tag/cli-v1.5.0)**. It offers a cyan/purple/green interactive menu, the same 108-game backend and safeguards, and scriptable commands:
 
 ```cmd
 GFW8LG-CLI.exe --game "Dragon Mania Legends" --receipt --token
@@ -21,6 +21,8 @@ See the [CLI guide](docs/CLI.md) for receipt import, Presence, cancellation, exi
 
 ## Features
 
+- Temporary and permanent receipt pairing, checkable peer catalogues, bulk downloads, transfer activity, and an optional background agent.
+- Receipt installation from folders, ZIP and 7z archives, with game identification and a preview before installation.
 - 108 receipt entries and 108 token attempt configurations.
 - Fresh receipts for installed or uninstalled games, plus signature-checked receipt import.
 - Optional token acquisition and Presence testing for uninstalled games.
@@ -82,6 +84,8 @@ These tests use synthetic receipt outcomes and a local WPF test window. They do 
 | --- | --- |
 | `src/ui` | WPF/PowerShell GUI, launcher and supporting C# |
 | `src/native` | C++/WinRT authentication helper source |
+| `src/sharing` | Encrypted receipt sharing agent, IPC client and sharing window |
+| `relay` | Cloudflare Worker and Durable Objects relay |
 | `src/cli` | Standalone console launcher, menus and command-line interface |
 | `src/metadata` | Retained manifests and additional-route provenance |
 | `backend` | Receipt/token backend, catalogue and required runtime dependencies |
@@ -90,3 +94,5 @@ These tests use synthetic receipt outcomes and a local WPF test window. They do 
 | `docs` | User guide and sanitized validation records |
 
 See [third-party notices](THIRD-PARTY-NOTICES.md) for the bundled Microsoft components and artwork attribution.
+
+The main GUI includes **Install Receipts** beside Receipt Sharing. Choose a folder, ZIP, or 7z, review matching games, and install verified pop.bin files into their package data folders. The CLI offers the same workflow with **I**. See [the installer guide](docs/RECEIPT-INSTALLER.md).

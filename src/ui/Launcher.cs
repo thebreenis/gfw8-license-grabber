@@ -57,14 +57,14 @@ static class Launcher {
  }
  [STAThread] static void Main(string[] args) {
   try {
+   if(args.Length==2&&args[0]=="--verify-bundle"){
+    string verified=Unpack();File.WriteAllText(Path.GetFullPath(args[1]),"{\"bundleVerified\":true,\"runtimeRoot\":\""+verified.Replace("\\","\\\\")+"\"}");return;
+   }
    bool acquired;
    using(var instance=new Mutex(true,"Local\\GFW8LicenseGrabber-"+WindowsIdentity.GetCurrent().User.Value,out acquired)){
    if(!acquired){MessageBox.Show("GFW8 License Grabber is already running.","GFW8 License Grabber");return;}
    try{
    string root=Unpack();
-   if(args.Length==2&&args[0]=="--verify-bundle"){
-    File.WriteAllText(Path.GetFullPath(args[1]),"{\"bundleVerified\":true,\"runtimeRoot\":\""+root.Replace("\\","\\\\")+"\"}");return;
-   }
    Environment.SetEnvironmentVariable("PSExecutionPolicyPreference","Bypass",EnvironmentVariableTarget.Process);
    using(var runspace=RunspaceFactory.CreateRunspace(InitialSessionState.CreateDefault())) {
     runspace.ApartmentState=ApartmentState.STA;runspace.ThreadOptions=PSThreadOptions.ReuseThread;runspace.Open();

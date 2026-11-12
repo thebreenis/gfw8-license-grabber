@@ -1,0 +1,63 @@
+{
+  "date": "2026-11-12",
+  "guiVersion": "1.6.0",
+  "cliVersion": "1.2.0",
+  "agentProtocolImplementation": "1.1.0",
+  "relayVersion": "ac2d0e3f-23b1-40c9-b3b3-c73411af5df9",
+  "features": {
+    "metroChromeAndMainIcon": true,
+    "windowTitle": "Receipt Sharing",
+    "separateGeneratedAndJoinFields": true,
+    "codeButtons": [
+      "Temporary Pairing Code",
+      "Permanent Pairing Code"
+    ],
+    "selfJoinRejectedLocally": true,
+    "joinTimeoutSeconds": 30,
+    "joinCancellation": true,
+    "maximumConcurrentTransfers": 4,
+    "maximumQueuedAndActiveTransfers": 16,
+    "microsoftAcquisitionsSerializedPerWindowsUser": true,
+    "manualLicenseScan": true,
+    "scanCooldownMinutes": 15,
+    "scanCooldownIsMicrosoftPublishedLimit": false,
+    "throttleHandling": "Stop on HTTP429 or HTTP503 with Retry-After; persist backoff and honor longer Retry-After values",
+    "lastCompletedScanAndCatalogueChangeReminder": true,
+    "completedScanDenialsSupersedeOlderOwnedRecords": true,
+    "laterSuccessfulIndividualPullCanRestoreEntry": true,
+    "cliSharingScanAndCancellation": true
+  },
+  "validation": {
+    "agentLocalSyntheticChecks": 31,
+    "agentLiveSyntheticChecks": 31,
+    "relayLocalChecks": 16,
+    "relayLiveChecks": 16,
+    "cliOfflineChecks": 23,
+    "scanAdapterSynthetic": true,
+    "backoffTestsSynthetic": true,
+    "bulkStopsOnThrottle": true,
+    "invalidImportChecks": 5,
+    "pickerChecks": 7,
+    "uiInspectedAtDefaultMaximizedAndMinimumSizes": true,
+    "uiSelfJoinDisabledAndScanFreshnessObserved": true,
+    "sourceAndBundlePrivacyChecksPassed": true,
+    "currentReadOnlyInventoryCount": 16,
+    "currentReadOnlyInventoryHasPriorScan": true,
+    "liveFullMicrosoftScanPerformed": false
+  },
+  "publication": {
+    "githubPushed": false,
+    "githubReleaseCreated": false,
+    "relayUpdatedForCancellation": true
+  },
+  "artifacts": [
+    {
+      "name": "GFW8 License Grabber.exe",
+      "sha256": "6ea4fe797245511dc1467f5ef7720ca740f155e54d1d3b7c4251e80282d1025b"
+    },
+    {
+      "name": "GFW8LG-CLI.exe",
+      "sha256": "b8c5e223a10df8df3c681ee0164d3b228fe3f11e795683b3ddc99a450f951ce3"
+    }
+  ]
+}

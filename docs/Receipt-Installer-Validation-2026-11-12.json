@@ -1,0 +1,67 @@
+{
+  "date": "2026-11-12",
+  "guiVersion": "1.7.0",
+  "cliVersion": "1.3.0",
+  "features": {
+    "builtIntoMainExecutable": true,
+    "mainWindowButton": "Install Receipts",
+    "cliMenuKey": "I",
+    "automaticFolderPicker": "%LOCALAPPDATA%\\GFW8LicenseGrabber\\Games",
+    "allReceiptAcquisitionPathsSaveUnderGames": true,
+    "folderAndNestedZipDiscovery": true,
+    "driveRootAndWindowsBlocking": true,
+    "reparsePointsSkippedOrRejected": true,
+    "microsoftSignatureAndSigned24HourValidityChecked": true,
+    "bomRemovedInStagedCopy": true,
+    "newestValidPerGameSelected": true,
+    "uninstalledGamesRequireOptIn": true,
+    "currentUserPackageDestination": "%LOCALAPPDATA%\\Packages\\<family>\\LocalState\\Microsoft.Xbox\\pop.bin",
+    "existingReceiptBackups": true,
+    "runningGamesAndNewerReceiptsSkipped": true,
+    "mainStyleMinimizeMaximizeClose": true
+  },
+  "validation": {
+    "isolatedInstallerTestsPassed": true,
+    "testsCover": [
+      "recursive discovery",
+      "ZIP traversal isolation",
+      "newest duplicate selection",
+      "invalid and expired rejection",
+      "BOM-free staged/install bytes",
+      "uninstalled opt-in",
+      "original backup bytes",
+      "running-game skipping",
+      "newer installed receipt retention",
+      "preview tamper rejection",
+      "drive/Windows blocking",
+      "cancellation",
+      "junction skip"
+    ],
+    "cliOfflineChecksPassed": 26,
+    "bundleAndPrivacyChecksPassed": true,
+    "realSignedReceiptsScanOnly": {
+      "receipts": 122,
+      "games": 61,
+      "duplicates": 61,
+      "rejected": 0
+    },
+    "guiZipPickerPreviewAndUninstalledPromptObserved": true,
+    "automaticGamesPickerObserved": true,
+    "mainWindowIntegrationAndChromeObserved": true,
+    "maximizeRestoreObserved": true,
+    "actualGameFolderInstallsPerformed": 0,
+    "microsoftRequests": 0,
+    "githubPushed": false,
+    "relayRedeployed": false
+  },
+  "artifacts": [
+    {
+      "name": "GFW8 License Grabber.exe",
+      "sha256": "b4da41d0ff968e0ff12b76e1c27aedb104987ea50e25bfaf43cdc66fb73473b6"
+    },
+    {
+      "name": "GFW8LG-CLI.exe",
+      "sha256": "1fca456b02d0354a3255ba886979d7a2c36e36d5bc90463e5ae256335024312d"
+    }
+  ]
+}

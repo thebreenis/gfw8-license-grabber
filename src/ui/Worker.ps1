@@ -4,6 +4,7 @@ $ErrorActionPreference='Stop'
 . "$PSScriptRoot\GuiBackend.ps1"
 . "$PSScriptRoot\InstalledGames.ps1"
 . "$PSScriptRoot\LegacyPackageRecovery.ps1"
+. "$PSScriptRoot\ReceiptInstaller.ps1"
 Initialize-GuiStorage
 $request=Get-Content -LiteralPath $RequestPath -Raw|ConvertFrom-Json
 $script:GuiOperation=[string]$request.action
@@ -27,6 +28,8 @@ try{
   'token' {Get-GuiToken $game $request.proofPath;break}
   'presence' {Test-GuiPresence $game $request.token;break}
   'bulk' {Get-AllGuiReceipts $games (Join-Path $job 'cancel.flag');break}
+  'installerScan' {New-ReceiptInstallPlan $request.source $games $job (Join-Path $job 'cancel.flag');break}
+  'installerApply' {Install-ReceiptPlan $request.planPath $games ([bool]$request.includeUninstalled) $job (Join-Path $job 'cancel.flag');break}
   default {throw 'Unknown operation.'}
  }
  $result.success=$true;$result.data=$data

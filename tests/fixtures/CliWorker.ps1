@@ -6,6 +6,8 @@ $job=Split-Path $RequestPath -Parent
 $result=[ordered]@{success=$true;data=@{}}
 $id=[int]$request.gameId
 switch($request.action){
+ 'installerScan' {$result.data=@{message='Fixture installer preview';planPath='fixture-plan';entries=@(@{game='Fixture Game';installed=$false;destination='[fixture package destination]'});issues=@()}}
+ 'installerApply' {$result.data=@{message=$(if($request.includeUninstalled){'Fixture receipts installed'}else{'Fixture installed games only'});entries=@(@{game='Fixture Game';message='Fixture receipt installed.'})}}
  'receipt' {
   if($id -eq 28){$result.success=$false;$result.unlicensed=$true;$result.message='Fixture: no license.'}
   else{$result.data.receipt=@{gameId=$id;path='[fixture receipt]';proofPath='[fixture proof]';mintedUtc=[DateTimeOffset]::UtcNow.ToString('o');expiresUtc=[DateTimeOffset]::UtcNow.AddHours(24).ToString('o')}}

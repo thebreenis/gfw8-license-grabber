@@ -1,0 +1,27 @@
+{
+  "date": "2026-11-12",
+  "guiVersion": "1.9.0",
+  "cliVersion": "1.5.0",
+  "sharingAgentVersion": "1.2.0",
+  "sharingIntegrationChecksPassed": 42,
+  "cliOfflineChecksPassed": 26,
+  "embeddedBundleVerificationPassed": true,
+  "packageAndPrivacyChecksPassed": true,
+  "cleanSourceArchiveBuildPassed": true,
+  "friendCatalogue": "One snapshot per connection; explicit manual refresh; withdrawals still enforced.",
+  "bulkDownloads": "Checked selections or Select All, sequential; cancel after current receipt; first failure stops batch.",
+  "activity": "Latest 200 private persistent events: peer connect/disconnect, downloads, sends, receiver-confirmed saved downloads.",
+  "nativePreview": {
+    "dpiPercent": 125,
+    "threeCheckedDownloadsCompleted": true,
+    "checksRetainedDuringStatusPolling": true,
+    "twoDirectionActivityObserved": true
+  },
+  "testData": "Synthetic isolated local peers and local relay only.",
+  "realMicrosoftRequests": 0,
+  "realGameRegistrationsChanged": 0,
+  "realFriendTransferTested": false,
+  "cloudflareDeployed": false,
+  "githubPushed": false,
+  "compatibility": "Both peers should update for saved-receipt confirmations."
+}

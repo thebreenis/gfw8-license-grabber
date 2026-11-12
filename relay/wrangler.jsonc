@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "gfw8lg-receipt-relay",
+  "main": "src/index.js",
+  "compatibility_date": "2026-11-12",
+  "workers_dev": true,
+  "durable_objects": { "bindings": [
+    { "name": "DEVICES", "class_name": "Device" },
+    { "name": "INVITATIONS", "class_name": "Invitation" }
+  ]},
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Device", "Invitation"] }],
+  "observability": { "enabled": true, "head_sampling_rate": 0.1,
+    "traces": { "enabled": true, "head_sampling_rate": 0.1 } }
+}

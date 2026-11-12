@@ -6,7 +6,9 @@ try{
  if(Test-Path -LiteralPath $OutputPath){Get-Content -LiteralPath $OutputPath -Raw}
  exit 0
 }catch{
+ $failure=$_
  if(Test-Path -LiteralPath $OutputPath){Get-Content -LiteralPath $OutputPath -Raw}
- Write-Error $_.Exception.Message -ErrorAction Continue
+ try{[IO.File]::WriteAllText((Join-Path (Split-Path ([IO.Path]::GetFullPath($OutputPath)) -Parent) 'controller-error-private.log'),($failure.Exception.ToString()+[Environment]::NewLine+$failure.ScriptStackTrace),(New-Object Text.UTF8Encoding($false)))}catch{}
+ [Console]::Error.WriteLine($failure.Exception.Message)
  exit 1
 }

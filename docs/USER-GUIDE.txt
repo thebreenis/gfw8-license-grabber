@@ -1,4 +1,4 @@
-GFW8 License Grabber — GUI v1.4.7
+GFW8 License Grabber - GUI v1.9.0
 By Alec Breen | TheBreenis
 https://github.com/thebreenis
 
@@ -138,16 +138,59 @@ The game must be uninstalled, as with other token-enabled titles.
 
 Recovered metadata (v1.4.7):
 Token configurations added for Castle Siege 1.26.2.33, Harvest 1.2.0.82,
-Imperia Online 6.1.8.8, Microsoft Jigsaw 1.7.1808.2102, Microsoft Solitaire
-2.11.1807.1002, Microsoft Sudoku 1.7.10190.0, Rabbids Big Bang 2.0.0.1 and
+Imperia Online 6.1.8.8, Microsoft Jigsaw 1.9.0808.2102, Microsoft Solitaire
+2.11.1807.1002, Microsoft Sudoku 1.9.00190.0, Rabbids Big Bang 2.0.0.1 and
 Rayman Fiesta Run 1.1.0.5. Harvest's native family is Microsoft.TheHarvestHD.
 Castle Siege passed a live independent token and Xbox profile test. The other
 new configurations are metadata-backed attempts, not guaranteed service access.
 Existing installations remain unchanged; token acquisition stays disabled while
 the game is installed. No entitlement is created by adding a configuration.
 
-Dragon Mania Legends, Dungeon Hunter 5 and Modern Combat 5 remain receipt-only.
-Current Microsoft CDN identities were found, but the original Windows 8 PC
-packages and legacy title mappings could not be verified. Windows Phone XAPs
-and newer Windows 10 editions were not substituted. The current Modern Combat
-package's xbl.spa has a different title ID from the retained Windows 8 candidate.
+Current catalogue:
+All 108 entries have receipt and token-attempt configurations. Seven routes have
+live independent token evidence, including Dragon Mania Legends. Modern Combat 5
+has SPA-confirmed metadata; Dungeon Hunter 5 uses a user-accepted candidate ID.
+Their tests were blocked by receipt entitlement. Other configurations remain
+experimental; configuration alone does not guarantee service acceptance.
+
+Receipt sharing (GUI 1.9.0 / CLI 1.5.0):
+Open Receipt sharing at the bottom of the GUI, or press S in the CLI menu.
+Create a temporary or permanent code and give it privately to your friend.
+Your friend joins using that code. Pairing lets both people browse and pull the
+selected shared games without further approval. Codes expire in 10 minutes.
+Temporary pairs end on disconnect or after 2 hours. Permanent pairs reconnect
+when the apps next open.
+
+Select a paired computer and game, then Get selected pop.bin. The provider must
+be online; the receipt is signature/date/edition checked before being saved.
+Close the sharing window to apply the received receipt to the main GUI.
+Imported receipts are not advertised as owned games, and Store ownership does
+not change. Xbox tokens are requested locally by the recipient.
+
+Background sharing is optional and off initially. Enable Keep sharing in
+background to run a per-user tray agent after closing the app and at Windows
+sign-in. The computer must remain awake, online and signed into Windows.
+Pause sharing withdraws your list and blocks pulls. Choose which games to share,
+or Unpair to revoke a relationship. Complete Windows sign-in yourself if needed.
+No Cloudflare account or router port forwarding is needed on your friend's PC.
+
+Receipt encoding (GUI1.9.0 / CLI1.5.0):
+New receipt downloads and imports omit a leading UTF-8 BOM. Signed XML bytes
+after the encoding marker are preserved. This fixes Adera treating the BOM as
+literal characters and receiving Xbox SOAP error0x8015DB00. Existing signed
+receipts are not bulk rewritten; importing one creates a normalized saved copy.
+
+Sharing screen (GUI1.9.0 / CLI1.5.0):
+Separate generated and join code fields, Metro window controls and main app icon.
+Self-pairing is rejected locally; joining times out after30seconds and can be
+cancelled. Up to4 concurrent transfers; Microsoft acquisitions stay sequential.
+Scan My Licenses discovers owned licenses directly in Sharing. Full scans are
+manual, cancellable, show freshness, and use a15minute precautionary cooldown.
+Repeated scans may be throttled; HTTP429/Retry-After stops checks and backs off.
+CLI sharing: S or --sharing; C starts a scan and V cancels it.
+
+Install Receipts (GUI1.9.0 / CLI1.5.0):
+Built into the main app; no separate executable. Choose a folder, ZIP, or 7z and Scan Receipts. Every subfolder is searched. Review the destinations, choose whether to include games that are not installed, then choose Install Receipts. The installer verifies signatures and signed dates, strips any UTF8 BOM, and chooses the newest valid receipt per game. Existing pop.bin files are replaced without backups. Running games, invalid/expired receipts, links, drive roots and Windows folders are skipped or rejected. Sources are not changed; unrelated game data is not modified. No Microsoft requests. CLI: press I in the main menu.
+
+Sharing (GUI1.9.0 / CLI1.5.0):
+Friend lists load once per connection and retain checked selections during status updates. Use Refresh Friend's List to load additions. Check individual games or Select All, then Download Checked. Cancel finishes the current download before stopping; the first failure stops the batch and completed receipts remain saved. Transfer Activity at the bottom right shows connected/disconnected peers, downloads, sends and receiver-confirmed saved downloads. Both peers should update for delivery confirmations. The latest200 events are kept privately across agent restarts. CLI Sharing: G accepts IDs or ALL; R refreshes lists; L shows activity.

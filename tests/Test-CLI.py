@@ -44,7 +44,9 @@ with zipfile.ZipFile(payload, 'w', zipfile.ZIP_DEFLATED) as archive:
 windows = Path(os.environ['WINDIR'])
 csc = windows / 'Microsoft.NET/Framework64/v4.0.30319/csc.exe'
 exe = fixture / 'FixtureCLI.exe'
-subprocess.run([str(csc), '/nologo', '/target:exe', '/platform:x64', '/reference:System.Windows.Forms.dll', '/reference:System.IO.Compression.dll', '/reference:System.Web.Extensions.dll', '/resource:' + str(payload) + ',GFW8.Payload', '/out:' + str(exe), str(ROOT / 'build/CliProgram.cs')], check=True)
+fixture_source = fixture / 'FixtureProgram.cs'
+fixture_source.write_text((ROOT / 'build/CliProgram.cs').read_text().replace('GFW8LicenseGrabber-', 'GFW8LG-Test-').replace('Gfw8Sharing.ShareClient.AutoStartAsync(runtime);', '{}'), encoding='utf-8')
+subprocess.run([str(csc), '/nologo', '/target:exe', '/platform:x64', '/reference:System.Windows.Forms.dll', '/reference:System.IO.Compression.dll', '/reference:System.Web.Extensions.dll', '/resource:' + str(payload) + ',GFW8.Payload', '/out:' + str(exe), '/reference:System.Security.dll', str(fixture_source), str(ROOT / 'src/cli/Sharing.cs'), str(ROOT / 'src/sharing/ShareCrypto.cs'), str(ROOT / 'src/sharing/ShareClient.cs')], check=True)
 unlicensed = run(['--game', '28', '--receipt', '--token'], exe)
 check(unlicensed.returncode == 3, 'No-license exit code')
 check(unlicensed.stdout.count('Fixture: no license.') == 1, 'No-license event and final result print once')
@@ -64,6 +66,12 @@ cancelled = run(['--import', 'cancel-fixture', '--token'], exe)
 check(cancelled.returncode == 5 and 'Operation cancelled' in cancelled.stdout and 'Token saved:' not in cancelled.stdout, 'Worker cancellation stops following token action without a malformed DTO error')
 full = run(['--game', '26', '--receipt', '--token', '--presence'], exe)
 check(full.returncode == 0 and 'Active readback: True' in full.stdout and 'Temporary Presence removed: True' in full.stdout, 'Actual private worker IPC action chain')
+installer_no = run([], exe, stdin='i\nfixture.zip\nn\n0\n')
+check(installer_no.returncode == 0 and 'Fixture installer preview' in installer_no.stdout and 'Fixture receipts installed' not in installer_no.stdout, 'Installer uninstalled-game opt-out does not install')
+installer_cancel = run([], exe, stdin='i\nfixture.zip\ny\nn\n0\n')
+check(installer_cancel.returncode == 0 and 'Fixture receipts installed' not in installer_cancel.stdout, 'Installer final confirmation can cancel')
+installer_yes = run([], exe, stdin='i\nfixture.zip\n\ny\ny\n0\n')
+check(installer_yes.returncode == 0 and 'Type Y or N.' in installer_yes.stdout and 'Fixture receipts installed' in installer_yes.stdout, 'Installer explicit uninstalled-game opt-in and final confirmation')
 logs = Path(os.environ['LOCALAPPDATA']) / 'GFW8LicenseGrabber/Logs/CLI'
 before = set(logs.iterdir())
 process = subprocess.Popen([str(exe), '--no-color', '--bulk'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
@@ -78,7 +86,7 @@ try:
                 break
         time.sleep(.05)
     check(job is not None and (job / 'request-private.json').exists(), 'Bulk creates private worker job')
-    blocked = run(['--list'], exe)
+    blocked = run(['--game', '26', '--receipt'], exe)
     check(blocked.returncode == 1 and 'Close the running GUI/CLI' in blocked.stdout, 'Concurrent GUI/CLI operations blocked by shared mutex')
     (job / 'cancel.flag').write_text('cancel')
     stdout, stderr = process.communicate(timeout=15)

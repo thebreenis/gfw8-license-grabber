@@ -1,0 +1,38 @@
+{
+  "date": "2026-11-12",
+  "guiVersion": "1.6.1",
+  "cliVersion": "1.2.1",
+  "agentVersion": "1.1.1",
+  "changes": [
+    "Metro buttons for Receipt Sharing and Open Saved Files",
+    "Auto-sized pairing captions; code inputs shortened approximately 25 percent",
+    "Taller title area and persistent red close button",
+    "Every provider transfer requests a new Microsoft receipt; no cached fallback",
+    "New response independently verified for signature and signed 24-hour validity",
+    "Common persisted 15-minute full-scan cooldown for GUI Bulk, Sharing Scan and CLI Bulk",
+    "Shared receipt records and batch download summaries retained"
+  ],
+  "validation": {
+    "syntheticScanAndFreshnessAdapter": true,
+    "cachedValidReceiptDoesNotBypassReacquisition": true,
+    "deniedExpiredBadSignatureFailWithoutFallback": true,
+    "commonScanCooldownEnforced": true,
+    "bulkFolderAndThrottleTests": true,
+    "cliOfflineChecksPassed": 23,
+    "bundleChecksPassed": true,
+    "visualMainAndSharingInspectedAt125PercentDpi": true,
+    "liveMicrosoftAcquisitions": 0,
+    "githubPushed": false,
+    "relayRedeployed": false
+  },
+  "artifacts": [
+    {
+      "name": "GFW8 License Grabber.exe",
+      "sha256": "85f59e4688b7b57410ff4f4d6d612f38b06f4144175a000d22e2398411fd9768"
+    },
+    {
+      "name": "GFW8LG-CLI.exe",
+      "sha256": "f343ab12d859417db37179e66c45e0dcfed7d45429d2aeb31829272120df6280"
+    }
+  ]
+}

@@ -28,7 +28,14 @@ foreach($entry in $batch.bulk.entries|Where-Object status -eq saved){
 if(Test-Path (Join-Path $batch.run 'receipt-staging')){throw 'Staging leaked'}
 if(@($batch.bulk.entries|Where-Object {$_.status -in @('error','unlicensed') -and !$_.message}).Count){throw 'Failed attempt missing batch-log detail'}
 $script:cancelOnSuccess=$true
+Remove-Item -LiteralPath (Join-Path $script:DataRoot 'full-scan-cooldown-private.json')
 $result=Get-AllGuiReceipts $fixture $cancel
 if(!$result.bulk.cancelled -or $result.bulk.checked -ne 1 -or !(Test-Path $result.bulk.entries[0].receipt.path)){throw 'Cancellation lost completed output'}
 if(Test-Path (Join-Path $result.run 'receipt-staging')){throw 'Cancelled staging leaked'}
 Microsoft.PowerShell.Utility\Write-Output 'PASS: bulk success, denial, network error, invalid receipt and cancellation; no live requests.'
+$script:throttleCalls=0
+Remove-Item -LiteralPath (Join-Path $script:DataRoot 'full-scan-cooldown-private.json')
+function Request-GameReceipt($Game,[string]$Run){$script:throttleCalls++;$error=New-Object InvalidOperationException('Synthetic HTTP429');$error.Data['ReceiptRetryAfterSeconds']=900;throw $error}
+$result=Get-AllGuiReceipts $fixture (Join-Path $script:DataRoot 'no-cancel.flag')
+if(!$result.bulk.throttled -or $script:throttleCalls -ne 1 -or $result.bulk.checked -ne 1){throw 'Bulk did not stop immediately on throttling'}
+Microsoft.PowerShell.Utility\Write-Output 'PASS: bulk stops after the first throttled response.'

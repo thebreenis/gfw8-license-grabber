@@ -15,7 +15,7 @@ using System.Threading;
 using System.Web.Script.Serialization;
 using System.Windows.Forms;
 
-static class Program {
+static partial class Program {
  const string Version = "__CLI_VERSION__";
  static readonly JavaScriptSerializer Json = new JavaScriptSerializer { MaxJsonLength = 2097152 };
  static readonly string DataRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "GFW8LicenseGrabber");
@@ -157,7 +157,7 @@ static class Program {
  static Dictionary<string, object> Worker(string action, Dictionary<string, object> extra = null) {
   reportedErrors.Clear();
   if (demo) return DemoWorker(action, extra);
-  string logRoot = Path.Combine(DataRoot, "Logs"); PrivateDirectory(logRoot);
+  string logRoot = Path.Combine(DataRoot, action.StartsWith("installer") ? "ReceiptInstaller" : "Logs"); PrivateDirectory(logRoot);
   string cliRoot = Path.Combine(logRoot, "CLI"); PrivateDirectory(cliRoot);
   string job = Path.Combine(cliRoot, DateTime.UtcNow.ToString("yyyyMMdd-HHmmss-fff") + "-" + Guid.NewGuid().ToString("N").Substring(0, 8)); PrivateDirectory(job);
   var request = new Dictionary<string, object> { { "action", action }, { "gameId", Number(game, "index") }, { "storeAccount", account == "Not read yet" ? "" : account } };
@@ -170,7 +170,7 @@ static class Program {
    process.Start(); var stdout = process.StandardOutput.ReadToEndAsync(); var stderr = process.StandardError.ReadToEndAsync();
    ConsoleCancelEventHandler cancel = delegate(object sender, ConsoleCancelEventArgs e) {
     e.Cancel = true;
-    if (action == "bulk") { File.WriteAllText(Path.Combine(job, "cancel.flag"), "cancel"); Line("\n  Cancel requested. Finishing this receipt request first.", ConsoleColor.Yellow); }
+    if (action == "bulk" || action.StartsWith("installer")) { File.WriteAllText(Path.Combine(job, "cancel.flag"), "cancel"); Line("\n  Cancel requested. Finishing this receipt request first.", ConsoleColor.Yellow); }
     else Line("\n  Waiting for authentication/cleanup. Complete or cancel the Windows sign-in prompt.", ConsoleColor.Yellow);
    };
    Console.CancelKeyPress += cancel;
@@ -278,7 +278,7 @@ static class Program {
    Tile("TOKEN", ConsoleColor.DarkMagenta); Line("  4 Get Xbox token  9 Copy token XML");
    Tile("PRESENCE", ConsoleColor.DarkGreen); Line("  5 Test Presence + Last Played");
    Line("  6 Bulk receipts  7 Open saved files  8 Account/status");
-   Line("  L Save activity log                 0 Exit");
+   Line("  I Install receipts   S Receipt sharing  L Save activity log  0 Exit");
    string choice = Prompt("Choose:"); if (choice == null || choice == "0") return 0;
    try {
     switch (choice.Trim().ToLowerInvariant()) {
@@ -292,10 +292,22 @@ static class Program {
      case "8": Account(); Status(); break;
      case "9": CopyToken(); break;
      case "l": SaveLog(); break;
+     case "s": SharingMenu(); break;
+     case "i": InstallReceipts(); break;
      default: Line("  Choose one of the menu options.", ConsoleColor.Yellow); break;
     }
    } catch (Exception e) { Log(e.Message, ConsoleColor.Red); }
   }
+ }
+ static void InstallReceipts() {
+  if(demo){Line("  Receipt installation is unavailable in demo mode.");return;}
+  string source=Prompt("Folder, ZIP, or 7z containing pop.bin files:");if(String.IsNullOrWhiteSpace(source))return;
+  var result=Worker("installerScan",new Dictionary<string,object>{{"source",source.Trim('"')}});if(ErrorCode(result)!=0)return;var data=Map(Get(result,"data"));
+  Line(Text(data,"message"));if(Flag(data,"cancelled"))return;var rows=Get(data,"entries") as object[]??new object[0];foreach(var raw in rows){var row=Map(raw);Line("  "+Text(row,"game")+" | "+(Flag(row,"installed")?"Installed":"Not installed")+" | "+Text(row,"destination"));}
+  foreach(var raw in Get(data,"issues") as object[]??new object[0]){var row=Map(raw);Line("  Skipped: "+Text(row,"source")+" - "+Text(row,"message"),ConsoleColor.Yellow);}
+  if(rows.Length==0)return;bool include=false;if(rows.Any(x=>!Flag(Map(x),"installed"))){while(true){string answer=Prompt("Install receipts for games that are not installed? [Y/N]");if(answer==null)return;if(answer.Equals("y",StringComparison.OrdinalIgnoreCase)){include=true;break;}if(answer.Equals("n",StringComparison.OrdinalIgnoreCase))break;Line("  Type Y or N.");}}
+  if(!rows.Any(x=>include||Flag(Map(x),"installed")))return;string confirm=Prompt("Install the listed receipts now? Existing receipts will be replaced. [Y/N]");if(!String.Equals(confirm,"y",StringComparison.OrdinalIgnoreCase))return;
+  result=Worker("installerApply",new Dictionary<string,object>{{"planPath",Text(data,"planPath")},{"includeUninstalled",include}});if(ErrorCode(result)==0){data=Map(Get(result,"data"));Line(Text(data,"message"));foreach(var raw in Get(data,"entries") as object[]??new object[0]){var row=Map(raw);Line("  "+Text(row,"game")+": "+Text(row,"message"));}}
  }
  static void Help() {
   Header();
@@ -307,7 +319,7 @@ static class Program {
   Line("  --token                    Use the receipt acquired/imported in this run");
   Line("  --presence                 Test Presence + Last Played after --token");
   Line("  --bulk                     Receipts only for all 108 games; Ctrl+C cancels");
-  Line("  --status                   Read-only installation status for selected game");
+  Line("  --sharing                  Pair, browse and pull receipts; background options\n  --status                   Read-only installation status for selected game");
   Line("  --version  --help  --no-color  --demo\n");
   Line("  Examples:");
   Line("    GFW8LG-CLI.exe --game 26 --receipt --token");
@@ -337,12 +349,13 @@ static class Program {
    if (colour) { Console.BackgroundColor = ConsoleColor.Black; Console.ForegroundColor = ConsoleColor.White; }
    if (args.Contains("--version")) { Line("GFW8 License Grabber CLI v" + Version + " | Alec Breen | TheBreenis"); return 0; }
    if (args.Contains("--help") || args.Contains("-h")) { Help(); return 0; }
-   string select = null, import = null, verifyPath = null; bool list = false, getReceipt = false, getToken = false, presence = false, bulk = false, status = false;
+   string select = null, import = null, verifyPath = null; bool sharing = false, list = false, getReceipt = false, getToken = false, presence = false, bulk = false, status = false;
    for (int i = 0; i < args.Length; i++) {
     switch (args[i]) {
      case "--demo": demo = true; break;
      case "--no-color": break;
      case "--list": list = true; break;
+     case "--sharing": sharing = true; break;
      case "--receipt": getReceipt = true; break;
      case "--token": getToken = true; break;
      case "--presence": presence = true; break;
@@ -356,10 +369,11 @@ static class Program {
    }
    if (bulk && (getReceipt || getToken || presence || import != null || select != null || status || list)) throw new ArgumentException("--bulk is receipts-only and cannot be combined with game, receipt, token or Presence options.");
    if (getReceipt && import != null) throw new ArgumentException("Choose --receipt or --import.");
+   if (sharing && (bulk || list || getReceipt || getToken || presence || status || select != null || import != null)) throw new ArgumentException("Use --sharing by itself to open the sharing menu.");
    if (presence && !getToken) throw new ArgumentException("--presence requires --token in the same run.");
    if (getToken && !getReceipt && import == null) throw new ArgumentException("Use --receipt or --import with --token.");
    bool acquired;
-   using (var mutex = new Mutex(true, "Local\\GFW8LicenseGrabber-" + WindowsIdentity.GetCurrent().User.Value, out acquired)) {
+   using (var mutex = new Mutex(true, (demo || list || verifyPath != null ? "Local\\GFW8LG-ReadOnly-" + Process.GetCurrentProcess().Id : "Local\\GFW8LicenseGrabber-" + WindowsIdentity.GetCurrent().User.Value), out acquired)) {
     if (!acquired) { Line("Close the running GUI/CLI before starting another operation.", ConsoleColor.Yellow); return 1; }
     try {
      runtime = Unpack();
@@ -369,6 +383,8 @@ static class Program {
      Header(); if (select != null && !SelectGame(select)) return 2;
      if (list) { ListGames(); return 0; }
      if (bulk) return Bulk();
+     if (!demo && !status) Gfw8Sharing.ShareClient.AutoStartAsync(runtime);
+     if (sharing) { SharingMenu(); return 0; }
      bool command = getReceipt || import != null || getToken || presence || status;
      if (!command) return Menu();
      if ((getReceipt || status) && select == null && import == null) throw new ArgumentException("Choose --game for this operation.");

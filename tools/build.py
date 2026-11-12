@@ -10,6 +10,8 @@ import subprocess
 import sys
 import xml.etree.ElementTree as ET
 import zipfile
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import sharing_build
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -87,11 +89,14 @@ def main():
         rows = json.loads(inventory.read_text(encoding='utf-8-sig'))
         next(row for row in rows if row['path'] == 'Probe.exe')['sha256'] = new_hash.lower()
         inventory.write_text(json.dumps(rows, indent=2) + '\n', encoding='utf-8-sig')
+    import runtime_layout
+    runtime_files = runtime_layout.prepare(ROOT, stage)
+    sharing_files = sharing_build.build(ROOT, stage)
     payload = ROOT / 'build/gui-payload.zip'
     # Enumerate source-owned files only; test results in staging are never embedded.
     files = [stage / p.name for p in (ROOT / 'src/ui').iterdir() if p.name != 'Launcher.cs']
-    files += [stage / 'README.txt']
-    files += [stage / 'backend' / p.relative_to(ROOT / 'backend') for p in (ROOT / 'backend').rglob('*') if p.is_file()]
+    files += [stage / 'README.txt'] + sharing_files
+    files += runtime_files
     with zipfile.ZipFile(payload, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
         for file in sorted(files):
             assert file.name.lower() not in ('pop.bin', 'issued-token.xml', 'native-token.txt', 'request-private.json', 'registration.lock', 'appxmanifest.xml')
@@ -118,7 +123,7 @@ def main():
     cli_source = ROOT / 'build/CliProgram.cs'
     cli_source.write_text((ROOT / 'src/cli/Program.cs').read_text(encoding='utf-8-sig').replace('__CLI_VERSION__', cli_version), encoding='utf-8')
     cli_payload = ROOT / 'build/cli-payload.zip'
-    cli_names = {'Worker.ps1', 'GuiBackend.ps1', 'InstalledGames.ps1', 'LegacyPackageRecovery.ps1', 'InstalledGameHost.cs'}
+    cli_names = {'Worker.ps1', 'GuiBackend.ps1', 'InstalledGames.ps1', 'LegacyPackageRecovery.ps1', 'InstalledGameHost.cs', 'GFW8LG-Agent.exe', 'sharing-relay.json', 'ReceiptInstaller.ps1', 'ReceiptArchives.ps1'}
     with zipfile.ZipFile(payload) as source, zipfile.ZipFile(cli_payload, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as target:
         for entry in source.infolist():
             if entry.filename.startswith('backend/') or entry.filename in cli_names:
@@ -127,7 +132,8 @@ def main():
     subprocess.run([str(csc), '/nologo', '/target:exe', '/platform:x64', '/optimize+',
                     '/win32icon:' + str(stage / 'App.ico'), '/reference:System.Windows.Forms.dll',
                     '/reference:System.IO.Compression.dll', '/reference:System.Web.Extensions.dll',
-                    '/resource:' + str(cli_payload) + ',GFW8.Payload', '/out:' + str(cli_exe), str(cli_source)], check=True)
+                    '/reference:System.Security.dll', '/resource:' + str(cli_payload) + ',GFW8.Payload', '/out:' + str(cli_exe), str(cli_source),
+                    str(ROOT / 'src/cli/Sharing.cs'), str(ROOT / 'src/sharing/ShareCrypto.cs'), str(ROOT / 'src/sharing/ShareClient.cs')], check=True)
     subprocess.run([str(cli_exe), '--verify-bundle', str(ROOT / 'build/cli-embedded-verification.json')], check=True)
     assert json.loads((ROOT / 'build/cli-embedded-verification.json').read_text())['bundleVerified']
     built = [cli_exe] if args.cli_only else [exe, cli_exe]

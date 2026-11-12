@@ -119,8 +119,12 @@ function Import-GuiReceipt([string]$Path,$Games){
  if(!$receipt.Valid){throw 'Receipt expired or its timestamp is in the future. It was not loaded.'}
  $run=New-PoCRun $game.index
  $target=Join-Path $run 'pop.bin'
- [IO.File]::WriteAllBytes($target,$receipt.Bytes)
- if((Get-ResearchFileHash $target).Hash -ine $receipt.Hash){throw 'Receipt copy did not match the validated file.'}
+ $bytes=ConvertTo-GameReceiptBytes $receipt.Bytes
+ [IO.File]::WriteAllBytes($target,$bytes)
+ if($bytes.Length -ne $receipt.Bytes.Length){
+  # Revalidate the saved representation and use its actual hash in the proof.
+  $script:TrustedReceiptHash=$null;$receipt=Read-Receipt $target $game
+ }elseif((Get-ResearchFileHash $target).Hash -ine $receipt.Hash){throw 'Receipt copy did not match the validated file.'}
  $receipt.Path=$target
  Send-GuiLog 'Microsoft receipt signature verified.'
  Send-GuiLog ($game.name+' selected from receipt XML.')
@@ -205,14 +209,35 @@ function Get-GuiAccount {
  }
  [pscustomobject]@{email=$credential.AccountName;gamertag=$tag;message='Account information updated'}
 }
+function Get-FullReceiptScanNext {
+ $path=Join-Path $script:DataRoot 'full-scan-cooldown-private.json'
+ if(Test-Path -LiteralPath $path){
+  $record=Get-Content -LiteralPath $path -Raw|ConvertFrom-Json
+  return [DateTimeOffset]::Parse([string]$record.nextAllowedUtc)
+ }
+ return [DateTimeOffset]::MinValue
+}
+function Start-FullReceiptScan {
+ $sid=[Security.Principal.WindowsIdentity]::GetCurrent().User.Value
+ $mutex=New-Object Threading.Mutex($false,('Local\GFW8LG-FullReceiptScan-'+$sid));$held=$false
+ try{
+  try{$held=$mutex.WaitOne(10000)}catch [Threading.AbandonedMutexException]{$held=$true}
+  if(!$held){throw 'Another full scan is starting. Please try again shortly.'}
+  $next=Get-FullReceiptScanNext
+  if([DateTimeOffset]::UtcNow -lt $next){throw ('Full license scans share a 15-minute cooldown across Bulk and Sharing. Next scan after '+$next.ToLocalTime().ToString('t')+'. This is an app precaution, not a Microsoft safe-rate guarantee.')}
+  $now=[DateTimeOffset]::UtcNow
+  @{startedUtc=$now.ToString('o');nextAllowedUtc=$now.AddMinutes(15).ToString('o')}|ConvertTo-Json|Set-Content -LiteralPath (Join-Path $script:DataRoot 'full-scan-cooldown-private.json') -Encoding UTF8
+ }finally{if($held){$mutex.ReleaseMutex()};$mutex.Dispose()}
+}
 function Get-AllGuiReceipts($Games,[string]$CancelPath){
+ if(!(Test-Path -LiteralPath $CancelPath)){Start-FullReceiptScan}
  $batches=Ensure-GuiFolder (Join-Path $script:DataRoot 'Batches')
  $batch=New-PrivateFolder (Join-Path $batches ([DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss-fff')+'-'+[guid]::NewGuid().ToString('N').Substring(0,6)))
  Set-GuiStage 'Checking entitled receipts…' 0
  $script:BatchCredential=& $script:OriginalStoreCredential
  $script:StoreAccount=$script:BatchCredential.AccountName
  Send-GuiEvent 'account' @{email=$script:StoreAccount}
- $saved=0;$denied=0;$errors=0;$done=0;$entries=@();$started=[DateTime]::UtcNow
+ $saved=0;$denied=0;$errors=0;$done=0;$entries=@();$started=[DateTime]::UtcNow;$throttled=$false;$retryAfterSeconds=0
  $staging=New-PrivateFolder (Join-Path $batch 'receipt-staging')
  try{
   foreach($game in $Games){
@@ -231,6 +256,7 @@ function Get-AllGuiReceipts($Games,[string]$CancelPath){
     $saved++;$entries+=,[ordered]@{gameId=$game.index;game=$game.name;status='saved';receipt=$dto}
     Send-GuiLog ($game.name+': receipt saved.')
    }catch{
+    if($_.Exception.Data['ReceiptRetryAfterSeconds']){$throttled=$true;$retryAfterSeconds=[int]$_.Exception.Data['ReceiptRetryAfterSeconds']}
     if($_.Exception.Message.StartsWith('No license for this game/edition')){$denied++;$state='unlicensed';Send-GuiLog ($game.name+': no entitlement on this account.')}
     else{$errors++;$state='error';Send-GuiLog ($game.name+': '+$_.Exception.Message) 'error'}
     $entries+=,[ordered]@{gameId=$game.index;game=$game.name;status=$state;message=(Protect-LogText $_.Exception.Message)}
@@ -242,13 +268,15 @@ function Get-AllGuiReceipts($Games,[string]$CancelPath){
    }
    $done++;$remaining=if($done){[Math]::Max(0,[Math]::Round(([DateTime]::UtcNow-$started).TotalSeconds/$done*($Games.Count-$done)))}else{0}
    Send-GuiEvent 'bulk' @{done=$done;total=$Games.Count;saved=$saved;unlicensed=$denied;errors=$errors;remainingSeconds=$remaining;game=$game.name}
+   if($throttled){break}
+   if($script:BulkRequestDelayMs -gt 0){Start-Sleep -Milliseconds $script:BulkRequestDelayMs}
   }
  }finally{
   $script:BatchCredential.Token=$null;$script:BatchCredential=$null
   if(Test-Path -LiteralPath $staging){Remove-Item -LiteralPath $staging -ErrorAction Stop}
  }
  $cancelled=($done -lt $Games.Count)
- $summary=[ordered]@{checked=$done;total=$Games.Count;saved=$saved;unlicensed=$denied;errors=$errors;cancelled=$cancelled;entries=$entries}
+ $summary=[ordered]@{checked=$done;total=$Games.Count;saved=$saved;unlicensed=$denied;errors=$errors;cancelled=$cancelled;throttled=$throttled;retryAfterSeconds=$retryAfterSeconds;storeAccount=$script:StoreAccount;catalogueHash=(Get-ResearchFileHash (Join-Path $script:Root 'games.json')).Hash;entries=$entries}
  $summary|ConvertTo-Json -Depth 10|Set-Content (Join-Path $batch 'bulk-summary-private.json') -Encoding UTF8
  [pscustomobject]@{bulk=$summary;run=$batch;message=$(if($cancelled){'Bulk download cancelled'}else{'Bulk receipt download complete'})}
 }

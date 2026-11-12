@@ -1,0 +1,45 @@
+{
+  "guiVersion": "1.5.0",
+  "cliVersion": "1.1.0",
+  "agentVersion": "1.0.0",
+  "relayUrl": "https://gfw8lg-receipt-relay.alec2dabreen.workers.dev",
+  "relayVersion": "18323bb5-a939-4c68-9ea5-d63480772527",
+  "checks": {
+    "agentLocal": 20,
+    "agentLiveSynthetic": 20,
+    "relayLocal": 14,
+    "relayLiveSynthetic": 14,
+    "invalidReceiptImports": 5,
+    "cliOffline": 23,
+    "consoleColours": true,
+    "bulkSuccessOnlyFolders": true,
+    "gamePicker": 7,
+    "all108RoutesAndPackagePrivacy": true
+  },
+  "realLocalInventory": {
+    "verifiedLocallyAcquiredGames": 16,
+    "storeAcquisitionCalls": 0,
+    "xboxTokenOrPresenceCalls": 0
+  },
+  "limits": [
+    "Live transport checks used synthetic receipts; an actual transfer between two separate Windows PCs remains to be tested.",
+    "Receipt acceptance does not prove subsequent Xbox token acceptance for every title."
+  ],
+  "backgroundEnabledByDefault": false,
+  "paidPlanEnabled": false,
+  "githubReleasePublished": false,
+  "artifacts": [
+    {
+      "name": "GFW8 License Grabber.exe",
+      "sha256": "79fd69dedfad72b7873f00a02c20e1ff9e4ad49c01063e7586635295fafce7c7",
+      "bytes": 3656704
+    },
+    {
+      "name": "GFW8LG-CLI.exe",
+      "sha256": "912ffb0f811a952bd712068761028528843df3d373bb91b9014e101ed711a0c7",
+      "bytes": 3646464
+    }
+  ],
+  "sourceArchiveIndependentlyBuilt": true,
+  "challengeBodyConsumptionVerified": true
+}

@@ -87,7 +87,49 @@ function Get-ServiceErrorName([string]$Code){
  if($Code -ieq '0xc03f300c' -or $Code -eq '3225366540' -or $Code -eq '-1069600756'){return 'STORE_ERROR_UNLICENSED_USER'}
  return 'OTHER_SERVICE_ERROR'
 }
+function ConvertTo-GameReceiptBytes([byte[]]$Bytes){
+ # Some legacy SDKs widen UTF-8 BOM bytes into the literal characters U+00EF,
+ # U+00BB,U+00BF. Remove only this encoding marker, preserving all signed XML.
+ if($Bytes.Length -ge 3 -and $Bytes[0] -eq 0xEF -and $Bytes[1] -eq 0xBB -and $Bytes[2] -eq 0xBF){
+  $result=New-Object byte[] ($Bytes.Length-3)
+  [Buffer]::BlockCopy($Bytes,3,$result,0,$result.Length)
+  return ,$result
+ }
+ return ,$Bytes
+}
+function Get-ReceiptRetryDelay([string]$Value){
+ $seconds=0;$date=[DateTimeOffset]::MinValue
+ if([int]::TryParse($Value,[ref]$seconds) -and $seconds -gt 0){return $seconds}
+ if([DateTimeOffset]::TryParse($Value,[ref]$date)){return [Math]::Max(0,[int][Math]::Ceiling(($date-[DateTimeOffset]::UtcNow).TotalSeconds))}
+ return 0
+}
+function Get-ReceiptCooldown {
+ $path=Join-Path $script:DataRoot 'receipt-cooldown-private.json'
+ if(Test-Path -LiteralPath $path){try{$saved=Get-Content -LiteralPath $path -Raw|ConvertFrom-Json;$until=[DateTimeOffset]::Parse([string]$saved.untilUtc);if($until -gt [DateTimeOffset]::UtcNow){return [int][Math]::Ceiling(($until-[DateTimeOffset]::UtcNow).TotalSeconds)}}catch{}}
+ return 0
+}
+function Assert-ReceiptResponseAllowed([int]$status,[string]$retryAfter){
+ if($status -eq 429 -or ($status -eq 503 -and $retryAfter)){
+  # Fifteen minutes is an app precaution, not a published limit for this legacy API.
+  $delay=[Math]::Max(900,(Get-ReceiptRetryDelay $retryAfter))
+  if(!(Test-Path -LiteralPath $script:DataRoot)){$null=New-PrivateFolder $script:DataRoot}
+  @{untilUtc=[DateTimeOffset]::UtcNow.AddSeconds($delay).ToString('o');httpStatus=$status}|ConvertTo-Json|Set-Content -LiteralPath (Join-Path $script:DataRoot 'receipt-cooldown-private.json') -Encoding UTF8
+  $error=New-Object InvalidOperationException('Microsoft throttled receipt requests (HTTP '+$status+'). Checks stopped; try again later.');$error.Data['ReceiptRetryAfterSeconds']=$delay;throw $error
+ }
+}
 function Request-GameReceipt($Game,[string]$Run){
+ # Coordinate all local app workers; cached sharing transfers can still run concurrently.
+ $mutex=New-Object Threading.Mutex($false,('Local\GFW8LG-ReceiptRequests-'+[Security.Principal.WindowsIdentity]::GetCurrent().User.Value))
+ $locked=$false
+ try{
+  try{$locked=$mutex.WaitOne(120000)}catch [Threading.AbandonedMutexException]{$locked=$true}
+  if(!$locked){throw 'Another Microsoft receipt request is still running. Try again shortly.'}
+  $delay=Get-ReceiptCooldown
+  if($delay -gt 0){$error=New-Object InvalidOperationException('Microsoft receipt requests are cooling down. Try again after '+$delay+' seconds.');$error.Data['ReceiptRetryAfterSeconds']=$delay;throw $error}
+  Invoke-GameReceiptRequest $Game $Run
+ }finally{if($locked){$mutex.ReleaseMutex()};$mutex.Dispose()}
+}
+function Invoke-GameReceiptRequest($Game,[string]$Run){
  Write-Host ('Requesting Store edition: '+$Game.package_family_name)
  if($Game.identityWarning){Write-Host $Game.identityWarning -ForegroundColor Yellow}
  $credential=Get-StoreCredential
@@ -98,7 +140,8 @@ function Request-GameReceipt($Game,[string]$Run){
  $web.Headers['Authorization']='WLID1.0='+$credential.Token
  $web.Headers['MS-SiteName']='www.microsoft.com';$web.Headers['MS-RequestId']=[guid]::NewGuid().ToString();$web.Headers['MS-CorrelationId']=[guid]::NewGuid().ToString()
  try{$response=$web.GetResponse()}catch [Net.WebException]{if(!$_.Exception.Response){throw 'Receipt network/TLS request failed; no license conclusion can be drawn.'};$response=$_.Exception.Response}
- try{$status=[int]$response.StatusCode;$reader=New-Object IO.StreamReader($response.GetResponseStream());try{$raw=$reader.ReadToEnd()}finally{$reader.Dispose()}}finally{$response.Close();$web.Headers.Remove('Authorization');$credential.Token=$null}
+ try{$status=[int]$response.StatusCode;$retryAfter=[string]$response.Headers['Retry-After'];$reader=New-Object IO.StreamReader($response.GetResponseStream());try{$raw=$reader.ReadToEnd()}finally{$reader.Dispose()}}finally{$response.Close();$web.Headers.Remove('Authorization');$credential.Token=$null}
+ Assert-ReceiptResponseAllowed $status $retryAfter
  if($status -ne 200){throw ('Receipt HTTP '+$status+'. This is not automatically a no-license result.')}
  $envelope=$script:Json.DeserializeObject($raw);$code=[string]$envelope['errorCode'];$kind=Get-ServiceErrorName $code
  $report=[ordered]@{gameId=$Game.index;httpStatus=$status;serviceError=$code;serviceErrorName=$kind;accountNameAvailable=$credential.AccountNameAvailable;accountSource='WebAccount on the exact successful WAM credential response';success=$false}
@@ -107,7 +150,7 @@ function Request-GameReceipt($Game,[string]$Run){
   throw 'No license for this game/edition on the requesting account: 0xC03F300C (STORE_ERROR_UNLICENSED_USER). No Xbox authentication attempted.'
  }
  if($code -notin @('0','0x0','0x00000000') -or !$envelope['receipt']){throw ('Receipt service failed: '+$code+'. No token request attempted.')}
- $path=Join-Path $Run 'pop.bin';[IO.File]::WriteAllBytes($path,[Convert]::FromBase64String($envelope['receipt']))
+ $path=Join-Path $Run 'pop.bin';[IO.File]::WriteAllBytes($path,(ConvertTo-GameReceiptBytes ([Convert]::FromBase64String($envelope['receipt']))))
  $info=Read-Receipt $path $Game -SkipSignature
  $report.success=$true;$report.receiptSha256=$info.Hash;$report.receiptDate=$info.Minted.ToString('o');$report.policyExpires=$info.Expires.ToString('o')
  $report|ConvertTo-Json|Set-Content (Join-Path $Run 'receipt-result.json')
@@ -121,10 +164,31 @@ function Get-TokenWindow($Report){
 }
 function Get-TokenOutcome([int]$ExitCode,$Report,$Lifecycle,[bool]$ExportExists){
  $issued=($Report.tokenIssued -and $Report.nativeXboxJwt -and $Report.privateTokenExported -and $Report.helperStopped -and $Report.privateSessionRemoved -and $Report.helperRegistrationRemoved -and $ExportExists)
+ if($issued -and $Lifecycle.registrationRemoved -and ($Lifecycle.dataPreservationFailureType -or $Report.dataPreservationAlert)){return 'issued-with-data-alert'}
  if($issued -and $ExitCode -eq 0){return 'issued'}
  if($issued -and $Lifecycle.registrationRemoved -and $Lifecycle.cleanupFailureType -and !$Lifecycle.failureType){return 'issued-with-data-alert'}
  if(!$Report.tokenIssued -and [string]$Report.helperHresult -ieq '0x8086000c'){return 'reauthentication-required'}
  return 'failed'
+}
+function Write-TokenCleanupStatus($Report,$Lifecycle){
+ if($Report.helperStopped -and $Report.privateSessionRemoved -and $Lifecycle.registrationRemoved -and !$Lifecycle.cleanupFailureType){
+  Write-Host 'Helper cleanup: complete (process stopped; session removed; temporary registration removed).' -ForegroundColor Green
+ }else{
+  $processState=if($Report.helperStopped){'stopped'}else{'exit unconfirmed'}
+  $sessionState=if($Report.privateSessionRemoved){'removed'}else{'removal unconfirmed'}
+  $registrationState=if($Lifecycle.registrationRemoved){'removed'}else{'removal unconfirmed'}
+  Write-Host ('Helper cleanup: not fully confirmed (process: '+$processState+'; session: '+$sessionState+'; registration: '+$registrationState+'). Check private diagnostics before retrying.') -ForegroundColor Yellow
+ }
+}
+function Get-TokenFailureMessage($Report,$Lifecycle){
+ if(!$Report.helperStopped -or !$Report.privateSessionRemoved -or !$Lifecycle.registrationRemoved -or $Lifecycle.cleanupFailureType){return 'Token request failed and helper cleanup is not confirmed. Check private diagnostics before retrying.'}
+ if($Report.stage -eq 'xbox-response' -and $Report.xErr){
+  $message='Xbox rejected the token request ('+[string]$Report.xErr+').'
+  if(@($Report.faultText) -contains 'The creator of this fault did not specify a Reason.'){$message+=' The server did not provide a specific reason.'}
+  return $message
+ }
+ if($Report.helperHresult){return ('Windows token authorization failed ('+[string]$Report.helperHresult+'). See private diagnostics.')}
+ return 'Token acquisition failed before a usable token was issued. See private diagnostics.'
 }
 function Save-CurrentGameData($Configuration,[string]$Run){
  $data=Join-Path $env:LOCALAPPDATA ('Packages\'+$Configuration.family)
@@ -162,13 +226,25 @@ function Request-GameToken($Game,$Receipt,[string]$Run,[switch]$Reauthenticate,[
  $arguments=@('-NoProfile','-MTA','-ExecutionPolicy','Bypass','-File',$controller,'-GameId',[string]$Game.index,'-ReceiptPath',$Receipt.Path,'-OutputPath',$reportPath,'-PrivateTokenOutputDirectory',$export)
  if($Reauthenticate){$arguments+='-Reauthenticate';Write-Host 'Complete any Windows sign-in prompt yourself.'}
  if($PromptIfNeeded){$arguments+='-PromptIfNeeded';Write-Host 'Windows will show sign-in only if needed. Complete any Windows authentication prompt.'}
- $priorPreference=$ErrorActionPreference
- try{$ErrorActionPreference='Continue';& (Join-Path $PSHOME 'powershell.exe') @arguments *> (Join-Path $Run 'token-driver-private.log');$exitCode=$LASTEXITCODE}
- finally{$ErrorActionPreference=$priorPreference}
- if(!(Test-Path -LiteralPath $reportPath)){throw 'Token helper failed before it produced a result. No token success claimed.'}
+ $capture=Invoke-CapturedAuthDriver (Join-Path $PSHOME 'powershell.exe') $arguments (Join-Path $Run 'token-driver-private.log')
+ $exitCode=$capture.ExitCode
+ if(!(Test-Path -LiteralPath $reportPath)){Write-Host 'Helper cleanup: not confirmed because token diagnostics are missing.' -ForegroundColor Yellow;throw 'Token helper failed before it produced a result. No token success claimed.'}
  $report=Get-Content -LiteralPath $reportPath -Raw|ConvertFrom-Json
  $lifePath=Join-Path $Run 'temporary-helper.json'
  $life=if(Test-Path -LiteralPath $lifePath){Get-Content -LiteralPath $lifePath -Raw|ConvertFrom-Json}else{[pscustomobject]@{}}
+ Write-TokenCleanupStatus $report $life
+ if($life.dataPreservationFailureType){
+  try{
+   $afterCount=Save-CurrentGameData $config $Run
+   $report|Add-Member -NotePropertyName dataPreservationAlert -NotePropertyValue $true -Force
+   $report|Add-Member -NotePropertyName postRunFilesPreserved -NotePropertyValue $afterCount -Force
+   $report|ConvertTo-Json -Depth 8|Set-Content -LiteralPath $reportPath
+   Write-Host 'Game-data verification: changes detected. Before/after copies are preserved in saved diagnostics; no files were restored.' -ForegroundColor Yellow
+  }catch{
+   Write-Host 'Game-data verification: changes detected; the after-copy could not be completed. Keep the current data and inspect private diagnostics.' -ForegroundColor Yellow
+   throw 'Helper cleanup was checked, but changed app-data could not be fully preserved. Check private diagnostics before retrying.'
+  }
+ }
  $outcome=Get-TokenOutcome $exitCode $report $life (Test-Path (Join-Path $export 'issued-token.xml'))
  if($outcome -eq 'reauthentication-required'){
   $exception=New-Object InvalidOperationException('Windows silent sign-in needs verification: 0x8086000C (ONL_E_ACTION_REQUIRED). No Xbox exchange occurred. Retry the same receipt with Windows reauthentication; this is not a no-license error.')
@@ -176,11 +252,10 @@ function Request-GameToken($Game,$Receipt,[string]$Run,[switch]$Reauthenticate,[
   throw $exception
  }
  if($outcome -eq 'failed'){
-  $detail=if($report.helperHresult){$report.helperHresult}elseif($report.xErr){$report.xErr}else{$report.stage}
-  throw ('Token acquisition or cleanup failed: '+$detail+'. See private result folder. Original game registrations are never replaced.')
+  throw (Get-TokenFailureMessage $report $life)
  }
  if($outcome -eq 'issued-with-data-alert'){
-  $afterCount=Save-CurrentGameData $config $Run
+  $afterCount=if($report.postRunFilesPreserved){$report.postRunFilesPreserved}else{Save-CurrentGameData $config $Run}
   $report|Add-Member -NotePropertyName dataPreservationAlert -NotePropertyValue $true -Force
   $report|Add-Member -NotePropertyName postRunFilesPreserved -NotePropertyValue $afterCount -Force
   $report|ConvertTo-Json -Depth 8|Set-Content -LiteralPath $reportPath

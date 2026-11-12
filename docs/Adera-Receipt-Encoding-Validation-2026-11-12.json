@@ -1,0 +1,75 @@
+{
+  "date": "2026-11-12",
+  "game": "Adera 2.5.2.34894",
+  "sdk": "2.0.131.0",
+  "failure": {
+    "endpoint": "https://auth.xboxlive.com/XSts/xsts.svc/IWSTrust13",
+    "httpStatus": 200,
+    "soapFault": "s:Sender",
+    "xErr": "0x8015DB00",
+    "reason": "The creator of this fault did not specify a Reason.",
+    "receiptFileBytes": 1291,
+    "nativeReceiptCharacters": 1291,
+    "nativePrefixCodeUnits": [
+      239,
+      187,
+      191,
+      13,
+      10,
+      60
+    ]
+  },
+  "control": {
+    "change": "Remove leading UTF-8 BOM only; every following XML byte retained",
+    "receiptBytes": 1288,
+    "nativeReceiptCharacters": 1288,
+    "microsoftSignatureVerifiedBeforeAndAfter": true,
+    "sameReceiptTimestampAndEdition": true,
+    "sameAuthenticationEndpoint": true,
+    "tokenIssued": true,
+    "soapFault": false,
+    "profileHttpStatus": 200,
+    "signedInUiObserved": true,
+    "uninstrumentedLaunchSignedIn": true
+  },
+  "fix": {
+    "guiVersion": "1.5.1",
+    "cliVersion": "1.1.1",
+    "downloads": "Omit leading UTF-8 BOM",
+    "imports": "Normalize saved copy, reverify signature and record actual hash",
+    "existingReceiptsBulkRewritten": false,
+    "gameBinariesOrEndpointsModified": false,
+    "installedGameReceiptNormalized": true
+  },
+  "validation": {
+    "encodingChecks": 7,
+    "freshLiveAderaDownloadVerified": true,
+    "freshBytes": 1288,
+    "cliOfflineChecks": 23,
+    "bulkSuccessOnlyFoldersPassed": true,
+    "packageChecksPassed": true
+  },
+  "preservation": {
+    "baselineFiles": 158,
+    "changedFiles": 10,
+    "newFiles": 144,
+    "missingBaselineFiles": 0,
+    "originalReceiptBackupVerified": true,
+    "changedAndNewCopiesRetainedPrivately": true,
+    "gameplayEntered": false,
+    "allDataUnchangedClaimed": false,
+    "initialTraceCrashedAfterDetach": true,
+    "laterRunsClosedNormally": true
+  },
+  "scope": "Confirmed for this installed Adera build and receipt; other titles not live-tested for this encoding fix.",
+  "artifacts": [
+    {
+      "name": "GFW8 License Grabber.exe",
+      "sha256": "0d3e0c6b035cb1a1be6b94854dca614b56de1c928313ce07e6bd844bc1198e54"
+    },
+    {
+      "name": "GFW8LG-CLI.exe",
+      "sha256": "80c52f128751251612cf233d51d3279dc53c0c2d251318c54630a4ed2239262e"
+    }
+  ]
+}
