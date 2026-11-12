@@ -10,7 +10,7 @@ By **Alec Breen | TheBreenis**.
 
 Download **GFW8 License Grabber.exe** from [Releases](https://github.com/thebreenis/gfw8-license-grabber/releases/latest). The single executable includes its backend; no adjacent files or Python installation are needed to run it. Current version: **1.4.7**.
 
-Prefer CMD? Download the separate **[GFW8LG-CLI.exe v1.0.0](https://github.com/thebreenis/gfw8-license-grabber/releases/tag/cli-v1.0.0)**. It offers a cyan/purple/green interactive menu, the same 108-game backend and safeguards, and scriptable commands:
+Prefer CMD? Download the separate **[GFW8LG-CLI.exe v1.0.2](https://github.com/thebreenis/gfw8-license-grabber/releases/tag/cli-v1.0.2)**. It offers a cyan/purple/green interactive menu, the same 108-game backend and safeguards, and scriptable commands:
 
 ```cmd
 GFW8LG-CLI.exe --game "Dragon Mania Legends" --receipt --token

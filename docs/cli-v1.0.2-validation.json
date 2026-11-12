@@ -1,0 +1,20 @@
+{
+  "application": "GFW8 License Grabber CLI",
+  "version": "1.0.2",
+  "exeSha256": "e2e0888995cd2948bb622bf3e461d5fda3aaa02af1474e3b41fd81987dffbd7e",
+  "diagnosis": "One Adera token job, one installedBlocked result and one matching error event. CLI previously printed both the live worker error and final result.",
+  "fix": "Per-worker sanitized error ledger deduplicates event/final result and repeated events. Reset on each worker action, preserving later retry errors and final-result fallback when no event is received.",
+  "checksPassed": 23,
+  "priorBuildDuplicateReproduced": true,
+  "colorHeadingFixRetained": true,
+  "attachedConsoleColorRegressionPassed": true,
+  "liveStoreXboxCalls": 0,
+  "gameRegistrationsChanged": 0,
+  "guiVersionUnchanged": "1.4.7",
+  "changes": [
+    "Reset tile background before newline; ordinary text/prompts explicitly use black",
+    "Serialize console color/output changes",
+    "Remove heading numbers from RECEIPT/TOKEN/PRESENCE; keep action shortcuts",
+    "Deduplicate errors per worker action across event/result; preserve retries and missing-event fallback"
+  ]
+}

@@ -17,6 +17,7 @@ switch($request.action){
  'token' {
   if($id -eq 2){$result.success=$false;$result.installedBlocked=$true;$result.message='Fixture: installed-game guard.'}
   elseif($id -eq 33){[Console]::Error.WriteLine('PRIVATE_FIXTURE_DIAGNOSTIC');$result.success=$false;$result.message='Fixture: worker failure.'}
+  elseif($id -eq 42){$result.success=$false;$result.message='Fixture: duplicate error events.'}
   else{$result.data.token=@{gameId=$id;exportPath='[fixture token]';expiresUtc=[DateTimeOffset]::UtcNow.AddHours(4).ToString('o');gamertag='FixturePlayer'}}
  }
  'presence' {$result.data.presence=@{presenceWriteAccepted=$true;activeReadback=$true;cleanupRequired=$true;cleanupAccepted=$true;targetAbsentAfterCleanup=$true}}
@@ -27,5 +28,10 @@ switch($request.action){
   $result.data.bulk=@{checked=1;saved=1;unlicensed=0;errors=0;cancelled=$true};$result.data.run='[fixture batch]'
  }
  default {$result.success=$false;$result.message='Unknown fixture action.'}
+}
+if(!$result.success -and $id -ne 33){
+ $event=@{kind='log';level='error';text=$result.message}|ConvertTo-Json -Compress
+ $count=if($id -eq 42){2}else{1}
+ @($event)*$count|Set-Content (Join-Path $job 'events.jsonl') -Encoding UTF8
 }
 $result|ConvertTo-Json -Depth 8|Set-Content (Join-Path $job 'result.json') -Encoding UTF8

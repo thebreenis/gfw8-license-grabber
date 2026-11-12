@@ -24,6 +24,8 @@ static class Program {
  static List<Dictionary<string, object>> games;
  static Dictionary<string, object> game, receipt, token;
  static readonly List<string> activity = new List<string>();
+ static readonly object consoleLock = new object();
+ static readonly HashSet<string> reportedErrors = new HashSet<string>(StringComparer.Ordinal);
  static ConsoleColor oldForeground, oldBackground;
 
  static Dictionary<string, object> Map(object value) { return value as Dictionary<string, object> ?? new Dictionary<string, object>(); }
@@ -39,18 +41,29 @@ static class Program {
   return text;
  }
  static void Line(string text, ConsoleColor foreground = ConsoleColor.Gray) {
-  if (colour) Console.ForegroundColor = foreground;
-  Console.WriteLine(text);
-  if (colour) Console.ForegroundColor = ConsoleColor.White;
+  lock (consoleLock) {
+   if (colour) { Console.BackgroundColor = ConsoleColor.Black; Console.ForegroundColor = foreground; }
+   Console.WriteLine(text);
+   if (colour) Console.ForegroundColor = ConsoleColor.White;
+  }
  }
  static void Log(string text, ConsoleColor foreground = ConsoleColor.Gray) {
   string safe = Safe(text); activity.Add(DateTime.Now.ToString("HH:mm:ss") + "  " + safe);
   Line("  " + safe, foreground);
  }
+ static void ReportError(string text) {
+  string safe = Safe(text);
+  if (reportedErrors.Add(safe)) Log(safe, ConsoleColor.Red);
+ }
  static void Tile(string text, ConsoleColor background) {
-  if (colour) { Console.BackgroundColor = background; Console.ForegroundColor = ConsoleColor.White; }
-  Console.WriteLine("  " + text.PadRight(72));
-  if (colour) { Console.BackgroundColor = ConsoleColor.Black; Console.ForegroundColor = ConsoleColor.White; }
+  lock (consoleLock) {
+   if (colour) { Console.BackgroundColor = background; Console.ForegroundColor = ConsoleColor.White; }
+   Console.Write("  " + text.PadRight(72));
+   // Reset before the newline: terminal scrolling/line erasure uses the current
+   // background colour and otherwise carries the tile colour onto the next row.
+   if (colour) { Console.BackgroundColor = ConsoleColor.Black; Console.ForegroundColor = ConsoleColor.White; }
+   Console.WriteLine();
+  }
  }
  static void Header() {
   Line(""); Tile("GFW8 LICENSE GRABBER  |  CLI v" + Version, ConsoleColor.DarkMagenta);
@@ -59,9 +72,11 @@ static class Program {
   Line("");
  }
  static string Prompt(string message) {
-  if (colour) Console.ForegroundColor = ConsoleColor.Cyan;
-  Console.Write("  " + message + " ");
-  if (colour) Console.ForegroundColor = ConsoleColor.White;
+  lock (consoleLock) {
+   if (colour) { Console.BackgroundColor = ConsoleColor.Black; Console.ForegroundColor = ConsoleColor.Cyan; }
+   Console.Write("  " + message + " ");
+   if (colour) Console.ForegroundColor = ConsoleColor.White;
+  }
   return Console.ReadLine();
  }
  static bool Confirm(string message) {
@@ -132,11 +147,15 @@ static class Program {
   if (kind == "account") {
    if (row.ContainsKey("email")) account = Text(row, "email");
    if (!String.IsNullOrEmpty(Text(row, "gamertag"))) gamertag = Text(row, "gamertag");
-  } else if (kind == "log") Log(Text(row, "text"), Text(row, "level") == "error" ? ConsoleColor.Red : Text(row, "level") == "warning" ? ConsoleColor.Yellow : ConsoleColor.Gray);
+  } else if (kind == "log") {
+   if (Text(row, "level") == "error") ReportError(Text(row, "text"));
+   else Log(Text(row, "text"), Text(row, "level") == "warning" ? ConsoleColor.Yellow : ConsoleColor.Gray);
+  }
   else if (kind == "stage") Line("  > " + Safe(Text(row, "text")), ConsoleColor.Cyan);
   else if (kind == "bulk") Line(String.Format("  [{0}/108]  Saved {1}   Unlicensed {2}   Errors {3}", Number(row, "done"), Number(row, "saved"), Number(row, "unlicensed"), Number(row, "errors")), ConsoleColor.Cyan);
  }
  static Dictionary<string, object> Worker(string action, Dictionary<string, object> extra = null) {
+  reportedErrors.Clear();
   if (demo) return DemoWorker(action, extra);
   string logRoot = Path.Combine(DataRoot, "Logs"); PrivateDirectory(logRoot);
   string cliRoot = Path.Combine(logRoot, "CLI"); PrivateDirectory(cliRoot);
@@ -181,7 +200,7 @@ static class Program {
  static int ErrorCode(Dictionary<string, object> result) {
   if (Flag(Map(Get(result, "data")), "cancelled")) { Log("Operation cancelled; completed results retained.", ConsoleColor.Yellow); return 5; }
   if (Flag(result, "success")) return 0;
-  Log(Text(result, "message"), ConsoleColor.Red);
+  ReportError(Text(result, "message"));
   return Flag(result, "unlicensed") ? 3 : Flag(result, "installedBlocked") ? 4 : 1;
  }
  static int Account() { gamertag = "Available after token acquisition"; var result = Worker("account"); if (ErrorCode(result) != 0) return 1; Line("  Microsoft account: " + account); Line("  Xbox profile: " + gamertag); return 0; }
@@ -255,9 +274,9 @@ static class Program {
   if (!demo) Account();
   while (true) {
    Line(""); Line("  Game: " + Text(game, "name") + "   |   Xbox: " + gamertag, ConsoleColor.White);
-   Tile("01 RECEIPT", ConsoleColor.DarkCyan); Line("  1 Select game     2 Get pop.bin     3 Import pop.bin");
-   Tile("02 TOKEN", ConsoleColor.DarkMagenta); Line("  4 Get Xbox token  9 Copy token XML");
-   Tile("03 PRESENCE", ConsoleColor.DarkGreen); Line("  5 Test Presence + Last Played");
+   Tile("RECEIPT", ConsoleColor.DarkCyan); Line("  1 Select game     2 Get pop.bin     3 Import pop.bin");
+   Tile("TOKEN", ConsoleColor.DarkMagenta); Line("  4 Get Xbox token  9 Copy token XML");
+   Tile("PRESENCE", ConsoleColor.DarkGreen); Line("  5 Test Presence + Last Played");
    Line("  6 Bulk receipts  7 Open saved files  8 Account/status");
    Line("  L Save activity log                 0 Exit");
    string choice = Prompt("Choose:"); if (choice == null || choice == "0") return 0;

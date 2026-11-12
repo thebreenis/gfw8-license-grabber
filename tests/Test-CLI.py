@@ -22,7 +22,8 @@ def run(args, exe=CLI, stdin=None):
 
 
 version = run(['--version'])
-check(version.returncode == 0 and 'CLI v1.0.0' in version.stdout and 'Alec Breen | TheBreenis' in version.stdout, 'Version and credit')
+expected_version = (ROOT / 'CLI_VERSION').read_text().strip()
+check(version.returncode == 0 and ('CLI v' + expected_version) in version.stdout and 'Alec Breen | TheBreenis' in version.stdout, 'Version and credit')
 listing = run(['--list'])
 lines = [line for line in listing.stdout.splitlines() if line.strip() and line.strip().split()[0].isdigit()]
 check(listing.returncode == 0 and len(lines) == 108, 'All108 catalogue entries')
@@ -31,7 +32,7 @@ for args in (['--bulk', '--token'], ['--token'], ['--presence'], ['--game'], ['-
 flow = run(['--demo', '--game', '26', '--receipt', '--token', '--presence'])
 check(flow.returncode == 0 and 'simulated' in flow.stdout and 'Temporary Presence removed: True' in flow.stdout, 'Demo action chain and cleanup display')
 menu = run(['--demo'], stdin='2\n4\n5\ny\n6\n0\n')
-check(menu.returncode == 0 and '01 RECEIPT' in menu.stdout and '02 TOKEN' in menu.stdout and '03 PRESENCE' in menu.stdout and 'Saved 16' in menu.stdout, 'Interactive menu receipt/token/Presence/bulk chain')
+check(menu.returncode == 0 and '  RECEIPT ' in menu.stdout and '  TOKEN ' in menu.stdout and '  PRESENCE ' in menu.stdout and 'Saved 16' in menu.stdout and not any(label in menu.stdout for label in ('01 RECEIPT', '02 TOKEN', '03 PRESENCE')), 'Interactive menu has unnumbered sections and receipt/token/Presence/bulk chain')
 
 # Build the unchanged CLI source with an explicitly synthetic worker resource.
 fixture = ROOT / 'build/cli-fixture'
@@ -44,10 +45,19 @@ windows = Path(os.environ['WINDIR'])
 csc = windows / 'Microsoft.NET/Framework64/v4.0.30319/csc.exe'
 exe = fixture / 'FixtureCLI.exe'
 subprocess.run([str(csc), '/nologo', '/target:exe', '/platform:x64', '/reference:System.Windows.Forms.dll', '/reference:System.IO.Compression.dll', '/reference:System.Web.Extensions.dll', '/resource:' + str(payload) + ',GFW8.Payload', '/out:' + str(exe), str(ROOT / 'build/CliProgram.cs')], check=True)
-check(run(['--game', '28', '--receipt', '--token'], exe).returncode == 3, 'No-license exit code')
-check(run(['--game', '2', '--receipt', '--token'], exe).returncode == 4, 'Installed-game guard exit code')
+unlicensed = run(['--game', '28', '--receipt', '--token'], exe)
+check(unlicensed.returncode == 3, 'No-license exit code')
+check(unlicensed.stdout.count('Fixture: no license.') == 1, 'No-license event and final result print once')
+installed = run(['--game', '2', '--receipt', '--token'], exe)
+check(installed.returncode == 4, 'Installed-game guard exit code')
+check(installed.stdout.count('Fixture: installed-game guard.') == 1, 'Installed guard event and final result print once')
+repeat = run(['--game', '2'], exe, stdin='2\n4\n4\n0\n')
+check(repeat.stdout.count('Fixture: installed-game guard.') == 2, 'Separate retries each print their error once')
+duplicate = run(['--game', '42', '--receipt', '--token'], exe)
+check(duplicate.returncode == 1 and duplicate.stdout.count('Fixture: duplicate error events.') == 1, 'Repeated same-job error events and result deduplicate')
 failure = run(['--game', '33', '--receipt', '--token'], exe)
 check(failure.returncode == 1 and 'PRIVATE_FIXTURE_DIAGNOSTIC' not in failure.stdout + failure.stderr, 'Private child diagnostics never leak to console')
+check(failure.stdout.count('Fixture: worker failure.') == 1, 'Missing error event still prints final-result error')
 imported = run(['--import', 'fixture-pop.bin', '--token'], exe)
 check(imported.returncode == 0 and 'Hitman GO receipt:' in imported.stdout and '[fixture token]' in imported.stdout, 'Import auto-selects game for following token action')
 cancelled = run(['--import', 'cancel-fixture', '--token'], exe)

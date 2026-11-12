@@ -1,6 +1,6 @@
 # GFW8 License Grabber CLI
 
-**v1.0.0 — Alec Breen | TheBreenis**
+**v1.0.2 — Alec Breen | TheBreenis**
 
 The command-line edition is a separate, single Windows x64 executable: `GFW8LG-CLI.exe`. It runs from CMD, PowerShell, or Windows Terminal. Its cyan, purple, and green console sections follow the GUI's Windows 8 colours. Plain text is used when output is redirected or `--no-color` is supplied.
 
