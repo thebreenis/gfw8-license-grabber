@@ -4,7 +4,20 @@ A Windows desktop tool for obtaining Windows Store `pop.bin` receipts and attemp
 
 By **Alec Breen | TheBreenis**.
 
+![GFW8 License Grabber app screenshot](docs/images/gfw8-license-grabber.png)
+
+*App preview with example account details.*
+
 Download **GFW8 License Grabber.exe** from [Releases](https://github.com/thebreenis/gfw8-license-grabber/releases/latest). The single executable includes its backend; no adjacent files or Python installation are needed to run it. Current version: **1.4.7**.
+
+Prefer CMD? Download the separate **[GFW8LG-CLI.exe v1.0.0](https://github.com/thebreenis/gfw8-license-grabber/releases/tag/cli-v1.0.0)**. It offers a cyan/purple/green interactive menu, the same 108-game backend and safeguards, and scriptable commands:
+
+```cmd
+GFW8LG-CLI.exe --game "Dragon Mania Legends" --receipt --token
+GFW8LG-CLI.exe --bulk
+```
+
+See the [CLI guide](docs/CLI.md) for receipt import, Presence, cancellation, exit codes, and offline demo mode. Both editions are single executables; close one before starting the other.
 
 ## Features
 
@@ -40,7 +53,7 @@ Install Python 3.10+ and run on Windows x64:
 python tools/build.py
 ```
 
-The standard-library-only builder creates `dist/GFW8 License Grabber.exe`, checks route metadata and runtime hashes, and verifies the embedded bundle. It uses the Windows .NET Framework C# compiler and includes the checked-in native helper/runtime dependencies. All paths are relative to the checkout.
+The standard-library-only builder creates `dist/GFW8 License Grabber.exe` and `dist/GFW8LG-CLI.exe`, checks route metadata and runtime hashes, and verifies both embedded bundles. It uses the Windows .NET Framework C# compiler and includes the checked-in native helper/runtime dependencies. All paths are relative to the checkout. Use `python tools/build.py --cli-only` to build only the console edition.
 
 To rebuild the native x86 helper as well, install Visual Studio C++ Build Tools and a Windows SDK with C++/WinRT headers:
 
@@ -58,6 +71,7 @@ After building:
 powershell.exe -NoProfile -MTA -ExecutionPolicy Bypass -File tests/Test-BulkFolders.ps1
 powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File tests/Test-GamePicker.ps1
 python tests/check_package.py
+python tests/Test-CLI.py
 ```
 
 These tests use synthetic receipt outcomes and a local WPF test window. They do not call Store/Xbox services, acquire real tokens, launch games, or alter game registrations. Historical sanitized release validations are in `docs/`; they record tested builds rather than promising universal compatibility.
@@ -68,6 +82,7 @@ These tests use synthetic receipt outcomes and a local WPF test window. They do 
 | --- | --- |
 | `src/ui` | WPF/PowerShell GUI, launcher and supporting C# |
 | `src/native` | C++/WinRT authentication helper source |
+| `src/cli` | Standalone console launcher, menus and command-line interface |
 | `src/metadata` | Retained manifests and additional-route provenance |
 | `backend` | Receipt/token backend, catalogue and required runtime dependencies |
 | `tools` | Portable build scripts |

@@ -30,3 +30,12 @@ if payload.exists():
         assert f'Text="v{version}"' in archive.read('MainWindow.xaml').decode()
         assert not any(Path(name).name.lower() in ('pop.bin', 'issued-token.xml', 'native-token.txt', 'registration.lock', 'appxmanifest.xml') for name in archive.namelist())
 print('PASS: 108 routes, manifest provenance, dependency hashes, version, package CRC and private-artifact exclusions.')
+cli_payload = ROOT / 'build/cli-payload.zip'
+if cli_payload.exists():
+    with zipfile.ZipFile(cli_payload) as archive:
+        assert archive.testzip() is None
+        assert 'Worker.ps1' in archive.namelist()
+        assert 'App.ps1' not in archive.namelist() and 'MainWindow.xaml' not in archive.namelist()
+        assert len(json.loads(archive.read('backend/games.json').decode('utf-8-sig'))['games']) == 108
+        assert not any(Path(name).name.lower() in ('pop.bin', 'issued-token.xml', 'native-token.txt', 'registration.lock', 'appxmanifest.xml') for name in archive.namelist())
+    print('PASS: minimal CLI bundle, all108 entries, CRC and private-artifact exclusions.')

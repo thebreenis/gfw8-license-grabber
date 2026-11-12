@@ -1,0 +1,55 @@
+{
+  "application": "GFW8 License Grabber CLI",
+  "version": "1.0.0",
+  "guiVersionUnchanged": "1.4.7",
+  "validatedUtc": "2026-11-12T16:18:36.781647+00:00",
+  "executableSha256": "01b5b2484dd5be5592f6d834c9cfbd848b78bcb641f02c3de2af83e67049bd72",
+  "singleExecutable": true,
+  "embeddedBundleVerified": true,
+  "minimalBackendPayloadCrcVerified": true,
+  "credit": "Alec Breen | TheBreenis",
+  "theme": "Windows8-inspired cyan, purple and green console sections; plain redirected output",
+  "coverage": {
+    "receiptEntries": 108,
+    "tokenConfigurations": 108,
+    "independentlyLiveVerifiedSharedBackendRoutes": 7
+  },
+  "features": [
+    "Interactive menu and scriptable flags",
+    "Receipt acquisition and signature-checked import/auto-selection",
+    "Optional token, one-shot PromptIfNeeded recovery, saved token clipboard",
+    "Optional Presence and Last Played with existing cleanup/readback",
+    "Installed-game guards and bulk receipts-only/success-only folders",
+    "Ctrl+C cooperative cancellation and wait-for-cleanup",
+    "Shared GUI/CLI mutex, private per-job diagnostics, sanitized activity log",
+    "Version, credit, help and defined exit codes"
+  ],
+  "offlineCliTests": {
+    "checksPassed": 18,
+    "workerCallsSynthetic": true,
+    "liveStoreOrXboxCalls": 0,
+    "gameRegistrationsChanged": 0,
+    "realReceiptOrTokenFilesCreated": 0
+  },
+  "additionalChecks": {
+    "realReadOnlyDmlInstallationStatusViaWorker": true,
+    "actualConsoleCtrlCWithSyntheticBulkWorker": true,
+    "guiPickerRegression7Checks": true,
+    "bulkSuccessDenialNetworkInvalidAndCancelRegression": true,
+    "sourceAndBundlePrivateArtifactScan": true
+  },
+  "guiPreview": {
+    "exampleAccountDetails": true,
+    "renderedFromActualWpfLayout": true,
+    "size": [
+      1320,
+      750
+    ],
+    "realAccountOrNetworkRequests": false
+  },
+  "limits": [
+    "CLI authentication and Presence use the unchanged GUI backend; no new live Store/Xbox authentication or activity writes were made while validating the CLI.",
+    "Seven shared-backend routes live-proven; remaining configurations experimental, with user-accepted candidate assumptions retained.",
+    "Published EXE checksum may differ from source rebuilds due compiler/packaging metadata."
+  ]
+}

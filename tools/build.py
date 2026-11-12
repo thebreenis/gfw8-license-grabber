@@ -53,6 +53,7 @@ def validate_routes():
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--rebuild-native', action='store_true', help='Requires VS C++ Build Tools and Windows SDK/C++ WinRT headers.')
+    parser.add_argument('--cli-only', action='store_true', help='Build only the console EXE.')
     args = parser.parse_args()
     if os.name != 'nt':
         sys.exit('Build on Windows 10/11 x64 with .NET Framework and Windows PowerShell 5.1.')
@@ -105,14 +106,33 @@ def main():
     dist = ROOT / 'dist'
     dist.mkdir(exist_ok=True)
     exe = dist / 'GFW8 License Grabber.exe'
-    subprocess.run([str(csc), '/nologo', '/target:winexe', '/platform:x64', '/optimize+',
+    if not args.cli_only:
+        subprocess.run([str(csc), '/nologo', '/target:winexe', '/platform:x64', '/optimize+',
                     '/win32icon:' + str(stage / 'App.ico'), '/reference:System.Windows.Forms.dll',
                     '/reference:System.IO.Compression.dll', '/reference:' + str(automation),
                     '/resource:' + str(payload) + ',GFW8.Payload', '/out:' + str(exe), str(stage / 'Launcher.cs')], check=True)
-    subprocess.run([str(exe), '--verify-bundle', str(ROOT / 'build/embedded-verification.json')], check=True)
-    assert json.loads((ROOT / 'build/embedded-verification.json').read_text())['bundleVerified']
-    (dist / 'SHA256SUMS.txt').write_text(digest(exe) + '  ' + exe.name + '\n', encoding='ascii')
-    print(json.dumps({'version': version, 'executable': str(exe), 'sha256': digest(exe), 'bundleVerified': True}))
+        subprocess.run([str(exe), '--verify-bundle', str(ROOT / 'build/embedded-verification.json')], check=True)
+        assert json.loads((ROOT / 'build/embedded-verification.json').read_text())['bundleVerified']
+    cli_version = (ROOT / 'CLI_VERSION').read_text().strip()
+    assert re.fullmatch(r'\d+\.\d+\.\d+', cli_version)
+    cli_source = ROOT / 'build/CliProgram.cs'
+    cli_source.write_text((ROOT / 'src/cli/Program.cs').read_text(encoding='utf-8-sig').replace('__CLI_VERSION__', cli_version), encoding='utf-8')
+    cli_payload = ROOT / 'build/cli-payload.zip'
+    cli_names = {'Worker.ps1', 'GuiBackend.ps1', 'InstalledGames.ps1', 'LegacyPackageRecovery.ps1', 'InstalledGameHost.cs'}
+    with zipfile.ZipFile(payload) as source, zipfile.ZipFile(cli_payload, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as target:
+        for entry in source.infolist():
+            if entry.filename.startswith('backend/') or entry.filename in cli_names:
+                target.writestr(entry, source.read(entry.filename))
+    cli_exe = dist / 'GFW8LG-CLI.exe'
+    subprocess.run([str(csc), '/nologo', '/target:exe', '/platform:x64', '/optimize+',
+                    '/win32icon:' + str(stage / 'App.ico'), '/reference:System.Windows.Forms.dll',
+                    '/reference:System.IO.Compression.dll', '/reference:System.Web.Extensions.dll',
+                    '/resource:' + str(cli_payload) + ',GFW8.Payload', '/out:' + str(cli_exe), str(cli_source)], check=True)
+    subprocess.run([str(cli_exe), '--verify-bundle', str(ROOT / 'build/cli-embedded-verification.json')], check=True)
+    assert json.loads((ROOT / 'build/cli-embedded-verification.json').read_text())['bundleVerified']
+    built = [cli_exe] if args.cli_only else [exe, cli_exe]
+    (dist / 'SHA256SUMS.txt').write_text(''.join(digest(p) + '  ' + p.name + '\n' for p in built), encoding='ascii')
+    print(json.dumps({'guiVersion': version, 'cliVersion': cli_version, 'files': [{'file': str(p), 'sha256': digest(p)} for p in built], 'bundlesVerified': True}))
 
 
 if __name__ == '__main__':
