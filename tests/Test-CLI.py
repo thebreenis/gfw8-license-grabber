@@ -7,7 +7,7 @@ import time
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-CLI = ROOT / 'dist/GFW8LG-CLI.exe'
+CLI = ROOT / ('dist/GFW8LG-CLI v' + (ROOT / 'CLI_VERSION').read_text().strip() + '.exe')
 checks = 0
 
 

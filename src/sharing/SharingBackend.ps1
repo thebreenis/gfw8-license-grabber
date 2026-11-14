@@ -44,12 +44,12 @@ try{
     try{
      $proof=Get-Content -LiteralPath $file.FullName -Raw|ConvertFrom-Json
      if($proof.origin -ne 'minted' -or $proof.storeAccount -ine $currentAccount -or [int]$proof.gameId -ne [int]$game.index){continue}
-     $path=[IO.Path]::GetFullPath([string]$proof.path)
+     $path=Resolve-GuiSavedReceiptPath ([string]$proof.path)
      if(!$path.StartsWith(([IO.Path]::GetFullPath($folder).TrimEnd('\')+'\'),[StringComparison]::OrdinalIgnoreCase)){continue}
      if((Get-ResearchFileHash $path).Hash -ine $proof.sha256){continue}
      $script:TrustedReceiptHash=$null;$signed=Read-Receipt $path $game
      if(!$signed.SignatureVerified){continue}
-     $available+=@([pscustomobject]@{gameId=[int]$game.index;name=$game.name;fresh=[bool]$signed.Valid;expiresUtc=$signed.Expires.ToUniversalTime().ToString('o')})
+     $available+=@([pscustomobject]@{gameId=[int]$game.index;name=($game.name+$(if($signed.LicenseType -eq 'Trial'){' [Trial]'}else{''}));licenseType=$signed.LicenseType;fresh=[bool]$signed.Valid;expiresUtc=$signed.Expires.ToUniversalTime().ToString('o')})
      $proofById[[int]$game.index]=$signed
      $proofTimeById[[int]$game.index]=$file.LastWriteTimeUtc
      break
@@ -90,9 +90,10 @@ try{
    $signed=Request-GameReceipt $game $job
    $script:TrustedReceiptHash=$null;$signed=Read-Receipt $signed.Path $game
    if(!$signed.SignatureVerified -or !$signed.Valid){throw 'The newly requested Store receipt is invalid or outside its 24-hour validity window.'}
-   $run=New-GuiGameRun $game 'Receipts';$target=Join-Path $run 'pop.bin'
+   $run=New-GuiGameRun $game 'Receipts' $signed;$target=Join-Path $run 'pop.bin'
    Copy-Item -LiteralPath $signed.Path -Destination $target;$signed.Path=$target
    $null=Save-ReceiptProof $game $signed 'minted' $run
+   Send-GuiLog ('Shared '+(Get-GuiReceiptType $signed)+' receipt saved.')
    $result.success=$true;$result.data=@{gameId=$id;receipt=[Convert]::ToBase64String($signed.Bytes);expiresUtc=$signed.Expires.ToUniversalTime().ToString('o')}
   }
  }else{throw 'Unsupported sharing operation.'}

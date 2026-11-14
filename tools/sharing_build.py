@@ -24,7 +24,7 @@ def build(root, stage):
     assert png.startswith(b'\x89PNG\r\n\x1a\n')
     (stage / 'sharing-icon.png').write_bytes(png)
     payload = root / 'build/agent-payload.zip'
-    files = {name: stage / name for name in ('GuiBackend.ps1', 'InstalledGames.ps1')}
+    files = {name: stage / name for name in ('GuiBackend.ps1', 'ReceiptStorage.ps1', 'InstalledGames.ps1')}
     files['SharingBackend.ps1'] = source / 'SharingBackend.ps1'
     for name in ('Core.ps1', 'games.json'):
         files['backend/' + name] = stage / 'backend' / name

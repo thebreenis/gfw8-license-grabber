@@ -44,7 +44,8 @@ function Read-Receipt([string]$Path,$Game,[switch]$SkipSignature){
  if($doc.DocumentElement.Name -ne 'Receipt' -or @($doc.SelectNodes('/Receipt/AppReceipt')).Count -ne 1){throw 'Expected exactly one signed AppReceipt.'}
  $app=$doc.SelectSingleNode('/Receipt/AppReceipt');$appId=$app.GetAttribute('AppId')
  if($appId -ine $Game.package_family_name -and $appId -ine $Game.legacy_store_guid){throw 'Receipt belongs to a different game/edition.'}
- if($app.GetAttribute('LicenseType') -ne 'Full'){throw 'Expected a Full receipt.'}
+ $licenseType=$app.GetAttribute('LicenseType')
+ if($licenseType -notin @('Full','Trial')){throw 'Unsupported receipt license type. Expected Full or Trial.'}
  $hash=(Get-ResearchFileHash $Path).Hash
  if($script:TrustedReceiptHash -and $script:TrustedReceiptHash -ieq $hash){$SkipSignature=$true}
  if(!$SkipSignature){
@@ -57,10 +58,11 @@ function Read-Receipt([string]$Path,$Game,[switch]$SkipSignature){
  }
  $minted=[DateTimeOffset]::Parse($doc.DocumentElement.GetAttribute('ReceiptDate'),[Globalization.CultureInfo]::InvariantCulture)
  $window=Get-ReceiptWindow $minted
- [pscustomobject]@{Path=[IO.Path]::GetFullPath($Path);Bytes=$bytes;Hash=(Get-ResearchFileHash $Path).Hash;Minted=$window.Minted;Expires=$window.Expires;Valid=$window.Valid;Future=$window.Future;SignatureVerified=(!$SkipSignature);AppId=$appId}
+ [pscustomobject]@{Path=[IO.Path]::GetFullPath($Path);Bytes=$bytes;Hash=(Get-ResearchFileHash $Path).Hash;Minted=$window.Minted;Expires=$window.Expires;Valid=$window.Valid;Future=$window.Future;SignatureVerified=(!$SkipSignature);AppId=$appId;LicenseType=$licenseType}
 }
 function Show-Receipt($Info){
  Write-Host 'Receipt signature and selected edition verified.' -ForegroundColor Green
+ Write-Host ('Receipt license type: '+$Info.LicenseType+'.')
  Write-Host ('Issued (XML ReceiptDate): '+(Format-Time $Info.Minted))
  Write-Host ('Expires (ReceiptDate + 24 hours): '+(Format-Time $Info.Expires))
  Write-Host ('Saved pop.bin: '+$Info.Path)
@@ -117,6 +119,10 @@ function Assert-ReceiptResponseAllowed([int]$status,[string]$retryAfter){
   $error=New-Object InvalidOperationException('Microsoft throttled receipt requests (HTTP '+$status+'). Checks stopped; try again later.');$error.Data['ReceiptRetryAfterSeconds']=$delay;throw $error
  }
 }
+function Get-ReceiptRequestUri($Game){
+ $product=([guid]$Game.legacy_store_guid).ToString()
+ 'https://licensingwindows.mp.microsoft.com/Licensing/License/AcquireReceipt/6.2/0?productId='+[Uri]::EscapeDataString($product)+'&receiptType=Full'
+}
 function Request-GameReceipt($Game,[string]$Run){
  # Coordinate all local app workers; cached sharing transfers can still run concurrently.
  $mutex=New-Object Threading.Mutex($false,('Local\GFW8LG-ReceiptRequests-'+[Security.Principal.WindowsIdentity]::GetCurrent().User.Value))
@@ -130,12 +136,13 @@ function Request-GameReceipt($Game,[string]$Run){
  }finally{if($locked){$mutex.ReleaseMutex()};$mutex.Dispose()}
 }
 function Invoke-GameReceiptRequest($Game,[string]$Run){
+ $uri=Get-ReceiptRequestUri $Game
  Write-Host ('Requesting Store edition: '+$Game.package_family_name)
  if($Game.identityWarning){Write-Host $Game.identityWarning -ForegroundColor Yellow}
  $credential=Get-StoreCredential
  Write-Host ('Receipt account (returned with this Windows SSO credential): '+$credential.AccountName) -ForegroundColor Cyan
 
- $web=[Net.HttpWebRequest]::Create('https://licensingwindows.mp.microsoft.com/Licensing/License/AcquireReceipt/6.2/0?productId='+([guid]$Game.legacy_store_guid).ToString()+'&receiptType=Full')
+ $web=[Net.HttpWebRequest]::Create($uri)
  $web.Proxy=$null;$web.AllowAutoRedirect=$false;$web.Method='POST';$web.Timeout=45000;$web.ReadWriteTimeout=45000;$web.ContentLength=0
  $web.Headers['Authorization']='WLID1.0='+$credential.Token
  $web.Headers['MS-SiteName']='www.microsoft.com';$web.Headers['MS-RequestId']=[guid]::NewGuid().ToString();$web.Headers['MS-CorrelationId']=[guid]::NewGuid().ToString()
@@ -144,15 +151,20 @@ function Invoke-GameReceiptRequest($Game,[string]$Run){
  Assert-ReceiptResponseAllowed $status $retryAfter
  if($status -ne 200){throw ('Receipt HTTP '+$status+'. This is not automatically a no-license result.')}
  $envelope=$script:Json.DeserializeObject($raw);$code=[string]$envelope['errorCode'];$kind=Get-ServiceErrorName $code
- $report=[ordered]@{gameId=$Game.index;httpStatus=$status;serviceError=$code;serviceErrorName=$kind;accountNameAvailable=$credential.AccountNameAvailable;accountSource='WebAccount on the exact successful WAM credential response';success=$false}
+ $report=[ordered]@{gameId=$Game.index;requestIdentity='legacy-guid';requestProductId=$Game.legacy_store_guid;httpStatus=$status;serviceError=$code;serviceErrorName=$kind;accountNameAvailable=$credential.AccountNameAvailable;accountSource='WebAccount on the exact successful WAM credential response';success=$false}
+ $report|ConvertTo-Json|Set-Content (Join-Path $Run 'receipt-result.json')
  if($kind -eq 'STORE_ERROR_UNLICENSED_USER'){
   $report|ConvertTo-Json|Set-Content (Join-Path $Run 'receipt-result.json')
   throw 'No license for this game/edition on the requesting account: 0xC03F300C (STORE_ERROR_UNLICENSED_USER). No Xbox authentication attempted.'
  }
- if($code -notin @('0','0x0','0x00000000') -or !$envelope['receipt']){throw ('Receipt service failed: '+$code+'. No token request attempted.')}
+ if($code -notin @('0','0x0','0x00000000') -or !$envelope['receipt']){
+  throw ('Receipt service failed: '+$code+'. No token request attempted.')
+ }
  $path=Join-Path $Run 'pop.bin';[IO.File]::WriteAllBytes($path,(ConvertTo-GameReceiptBytes ([Convert]::FromBase64String($envelope['receipt']))))
  $info=Read-Receipt $path $Game -SkipSignature
- $report.success=$true;$report.receiptSha256=$info.Hash;$report.receiptDate=$info.Minted.ToString('o');$report.policyExpires=$info.Expires.ToString('o')
+ $report.success=$true;$report.receiptSha256=$info.Hash;$report.receiptDate=$info.Minted.ToString('o');$report.policyExpires=$info.Expires.ToString('o');$report.returnedAppId=$info.AppId;$report.licenseType=$info.LicenseType
+ Write-Host ('Microsoft returned a '+$info.LicenseType+' receipt.')
+ Write-Host ('Returned receipt identity: '+$info.AppId)
  $report|ConvertTo-Json|Set-Content (Join-Path $Run 'receipt-result.json')
  return $info
 }
@@ -209,6 +221,7 @@ function Request-GameToken($Game,$Receipt,[string]$Run,[switch]$Reauthenticate,[
  $current=Read-Receipt $Receipt.Path $Game
  if(!$current.Valid){throw 'Receipt expired: acquire a new pop.bin before minting a token.'}
  if($current.Hash -ne $Receipt.Hash){throw 'Receipt changed since validation.'}
+ Write-Host ('Token request receipt type: '+$current.LicenseType+'.')
  if(!$Game.tokenAttemptAvailable){throw 'Token metadata for this title is not ready. Its signed pop.bin is still saved; no guessed Xbox title ID will be used.'}
  . (Join-Path $script:Runtime 'jetpack-auth-investigation\TemporaryAuthHelper.ps1')
  $config=Test-TemporaryAuthReady -GameId $Game.index

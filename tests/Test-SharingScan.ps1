@@ -4,7 +4,7 @@ $ErrorActionPreference='Stop';$repo=Split-Path $PSScriptRoot -Parent
 $root=New-PrivateFolder (Join-Path $repo ('build\scan-adapter-fixture-'+[guid]::NewGuid().ToString('N')))
 $runtime=Join-Path $root 'runtime';$null=New-Item -ItemType Directory -Path $runtime
 Copy-Item (Join-Path $repo 'build\staging\backend') (Join-Path $runtime 'backend') -Recurse
-foreach($name in 'GuiBackend.ps1','InstalledGames.ps1'){Copy-Item (Join-Path $repo ('src\ui\'+$name)) (Join-Path $runtime $name)}
+foreach($name in 'GuiBackend.ps1','ReceiptStorage.ps1','InstalledGames.ps1'){Copy-Item (Join-Path $repo ('src\ui\'+$name)) (Join-Path $runtime $name)}
 Copy-Item (Join-Path $repo 'src\sharing\SharingBackend.ps1') (Join-Path $runtime 'SharingBackend.ps1')
 $data=Join-Path $root 'data';$null=New-PrivateFolder $data
 $mock=@'

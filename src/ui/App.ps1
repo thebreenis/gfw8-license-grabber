@@ -1,7 +1,7 @@
 ﻿param([switch]$LayoutTest,[string]$LayoutReceiptPath)
 $ErrorActionPreference='Stop'
 $appRoot=$PSScriptRoot
-if($PSVersionTable.PSEdition -ne 'Desktop' -or ![Environment]::Is64BitProcess){throw 'Use GFW8 License Grabber.exe with Windows PowerShell 5.1 x64.'}
+if($PSVersionTable.PSEdition -ne 'Desktop' -or ![Environment]::Is64BitProcess){throw 'Use the GFW8 License Grabber executable with Windows PowerShell 5.1 x64.'}
 Add-Type -AssemblyName PresentationFramework,PresentationCore,WindowsBase
 Add-Type -Path (Join-Path $appRoot 'Sharing.dll')
 . "$appRoot\backend\Core.ps1"
@@ -122,7 +122,7 @@ function Set-ReceiptView($data,[bool]$Select=$true){
      # A different receipt invalidates the GUI's token association, never the saved token files.
      $state.receipt=$receipt;$state.token=$null
      $ui.ReceiptStatus.Text=if($receipt.origin -eq 'loaded'){'Receipt loaded'}else{'Receipt saved'}
-     $ui.ReceiptDetail.Text='pop.bin · Full license'
+     $ui.ReceiptDetail.Text='pop.bin · '+$(if($receipt.licenseType){$receipt.licenseType}else{'Full'})+' license'
      $ui.ReceiptMinted.Text=Short-Time $receipt.mintedUtc;$ui.ReceiptExpires.Text=Short-Time $receipt.expiresUtc
      $ui.TokenStatus.Text='No token yet';$ui.TokenIssued.Text='—';$ui.TokenExpires.Text='—'
      $ui.TokenDetail.Text=if($state.installed){'The selected game''s installation interferes with GFW8LG''s ability to grab the token. Please uninstall the selected game and try again.'}elseif($ui.GamePicker.SelectedItem.tokenAttemptAvailable){'Use this receipt to mint a token.'}else{'Token metadata unavailable for this title.'}

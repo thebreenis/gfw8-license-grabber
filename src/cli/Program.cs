@@ -322,9 +322,9 @@ static partial class Program {
   Line("  --sharing                  Pair, browse and pull receipts; background options\n  --status                   Read-only installation status for selected game");
   Line("  --version  --help  --no-color  --demo\n");
   Line("  Examples:");
-  Line("    GFW8LG-CLI.exe --game 26 --receipt --token");
-  Line("    GFW8LG-CLI.exe --import \"D:\\Receipts\\pop.bin\" --token --presence");
-  Line("    GFW8LG-CLI.exe --bulk\n");
+  Line("    \"GFW8LG-CLI v" + Version + ".exe\" --game 26 --receipt --token");
+  Line("    \"GFW8LG-CLI v" + Version + ".exe\" --import \"D:\\Receipts\\pop.bin\" --token --presence");
+  Line("    \"GFW8LG-CLI v" + Version + ".exe\" --bulk\n");
   Line("  Installed games: receipts only. Bulk never requests tokens.");
   Line("  Exit codes: 0 success, 1 error, 2 usage/missing receipt, 3 no license,");
   Line("              4 installed-game guard, 5 operation cancelled.");

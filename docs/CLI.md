@@ -1,16 +1,16 @@
 # GFW8 License Grabber CLI
 
-**v1.5.0 - Alec Breen | TheBreenis**
+**v1.6.1 - Alec Breen | TheBreenis**
 
-Download [CLI v1.5.0](https://github.com/thebreenis/gfw8-license-grabber/releases/tag/cli-v1.5.0) from GitHub Releases.
+Download [CLI v1.6.1](https://github.com/thebreenis/gfw8-license-grabber/releases/tag/cli-v1.6.1) from GitHub Releases.
 
-The command-line edition is a separate, single Windows x64 executable: `GFW8LG-CLI.exe`. It runs from CMD, PowerShell, or Windows Terminal. Its cyan, purple, and green console sections follow the GUI's Windows 8 colours. Plain text is used when output is redirected or `--no-color` is supplied.
+The command-line edition is a separate, single Windows x64 executable: `"GFW8LG-CLI v1.6.1.exe"`. The build inserts CLI_VERSION into its filename and Windows Properties details. It runs from CMD, PowerShell, or Windows Terminal. Its cyan, purple, and green console sections follow the GUI's Windows 8 colours. Plain text is used when output is redirected or `--no-color` is supplied.
 
 It shares the GUI's 108-game catalogue, receipt validation, private output folders, native helper, sign-in recovery, installed-game guards, and bulk receipt behaviour. No Python, SDK, or adjacent files are needed to run it. Windows PowerShell 5.1/.NET Framework and the same Windows account/Appx requirements apply.
 
 ## Interactive use
 
-Run `GFW8LG-CLI.exe` with no arguments. The header shows the CLI version and credit. Select a game by number or name, get or import a receipt, optionally get a token, and optionally test Presence. Importing a receipt automatically selects its game. Changing games clears the current receipt/token selection.
+Run `"GFW8LG-CLI v1.6.1.exe"` with no arguments. The header shows the CLI version and credit. Select a game by number or name, get or import a receipt, optionally get a token, and optionally test Presence. Importing a receipt automatically selects its game. Changing games clears the current receipt/token selection.
 
 The menu also offers bulk receipts, account/installation status, token clipboard copy, saving the sanitized activity log, and opening saved files. Presence asks before changing activity and submitting Last Played history. No achievement requests are made.
 
@@ -19,16 +19,16 @@ Press **S** for receipt sharing: temporary/permanent codes, join, peer catalogue
 ## Commands
 
 ```cmd
-GFW8LG-CLI.exe --sharing
-GFW8LG-CLI.exe --list
-GFW8LG-CLI.exe --game 26 --status
-GFW8LG-CLI.exe --game 26 --receipt
-GFW8LG-CLI.exe --game "Dragon Mania Legends" --receipt --token
-GFW8LG-CLI.exe --import "D:\Receipts\pop.bin" --token
-GFW8LG-CLI.exe --import "D:\Receipts\pop.bin" --token --presence
-GFW8LG-CLI.exe --bulk
-GFW8LG-CLI.exe --version
-GFW8LG-CLI.exe --help
+"GFW8LG-CLI v1.6.1.exe" --sharing
+"GFW8LG-CLI v1.6.1.exe" --list
+"GFW8LG-CLI v1.6.1.exe" --game 26 --status
+"GFW8LG-CLI v1.6.1.exe" --game 26 --receipt
+"GFW8LG-CLI v1.6.1.exe" --game "Dragon Mania Legends" --receipt --token
+"GFW8LG-CLI v1.6.1.exe" --import "D:\Receipts\pop.bin" --token
+"GFW8LG-CLI v1.6.1.exe" --import "D:\Receipts\pop.bin" --token --presence
+"GFW8LG-CLI v1.6.1.exe" --bulk
+"GFW8LG-CLI v1.6.1.exe" --version
+"GFW8LG-CLI v1.6.1.exe" --help
 ```
 
 `--presence` explicitly requests the Presence/Last Played operation and requires `--token` in the same invocation. `--token` requires `--receipt` or `--import`. Bulk cannot be combined with token or Presence operations. Installed games support receipts only; the backend checks installation again before token/Presence calls.

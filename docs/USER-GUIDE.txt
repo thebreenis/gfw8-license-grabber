@@ -1,8 +1,8 @@
-GFW8 License Grabber - GUI v1.9.0
+﻿GFW8 License Grabber - GUI v1.10.1
 By Alec Breen | TheBreenis
 https://github.com/thebreenis
 
-Run the single GFW8 License Grabber.exe. It carries the bundled backend; on first launch it unpacks and verifies a private versioned runtime. Windows 10/11
+Run the single versioned GFW8 License Grabber v<version>.exe. It carries the bundled backend; on first launch it unpacks and verifies a private versioned runtime. Windows 10/11
 x64, Windows PowerShell 5.1 and Windows Microsoft-account SSO are required.
 No Python, developer SDK or game installation is required. The backend's
 temporary Appx registration must be allowed by Windows. This app does not
@@ -194,3 +194,19 @@ Built into the main app; no separate executable. Choose a folder, ZIP, or 7z and
 
 Sharing (GUI1.9.0 / CLI1.5.0):
 Friend lists load once per connection and retain checked selections during status updates. Use Refresh Friend's List to load additions. Check individual games or Select All, then Download Checked. Cancel finishes the current download before stopping; the first failure stops the batch and completed receipts remain saved. Transfer Activity at the bottom right shows connected/disconnected peers, downloads, sends and receiver-confirmed saved downloads. Both peers should update for delivery confirmations. The latest200 events are kept privately across agent restarts. CLI Sharing: G accepts IDs or ALL; R refreshes lists; L shows activity.
+
+Full and Trial receipts
+-----------------------
+The app keeps both Microsoft-signed Full and Trial pop.bin receipts. The activity
+log and receipt card show the signed license type. Trial receipts may be used
+for token requests; Xbox decides whether a token can be issued for each title.
+Signatures, edition identity and the existing 24-hour receipt policy still apply.
+Receipt XML is never changed to convert Trial to Full.
+
+Receipt folders use the local issue time and license type, for example:
+  Receipts\2026-11-13 20-54-18 - Trial\pop.bin
+  Receipts\2026-11-13 17-58-54 - Full\pop.bin
+Copies with the same issue time get a numbered suffix. Existing receipt folders
+are renamed once on upgrade; receipt hashes are unchanged and stored references
+are updated. Old saved receipt paths continue to resolve through a private map.
+The game package-family folders remain stable so editions cannot be confused.

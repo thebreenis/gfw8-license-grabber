@@ -4,7 +4,7 @@ GUI 1.9.0 and CLI 1.5.0 include a receipt sharing agent, version 1.2.0, by Alec 
 
 ## Pair and pull
 
-Open **Receipt sharing** at the bottom of the GUI, or press **S** in the CLI menu (`GFW8LG-CLI.exe --sharing`). Each person uses their own Windows Microsoft account. Obtain your own receipts locally first; the shared list contains verified locally acquired receipt records for the current Windows receipt account. Imported receipts are not advertised as owned games.
+Open **Receipt sharing** at the bottom of the GUI, or press **S** in the CLI menu (`"GFW8LG-CLI v1.6.1.exe" --sharing`). Each person uses their own Windows Microsoft account. Obtain your own receipts locally first; the shared list contains verified locally acquired receipt records for the current Windows receipt account. Imported receipts are not advertised as owned games.
 
 Create a **Temporary Pairing Code** or **Permanent Pairing Code**, send the code privately, and have the other person paste it in the separate join field and choose **Join Code**. Codes are single use and expire after 10 minutes. Joining grants mutual access to each person's selected games; subsequent pulls need no provider approval. Keep the sharing screen open until the pair appears. Joining has a 30-second timeout and a Cancel button; your own generated code is rejected locally. Press Enter or Refresh in the CLI to see updated status.
 

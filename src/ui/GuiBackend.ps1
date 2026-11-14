@@ -1,4 +1,5 @@
 ﻿# Background-worker adapter for the existing receipt/token backend.
+. "$PSScriptRoot\ReceiptStorage.ps1"
 function Get-GuiFamilyName($Game){
  $name=[string]$Game.package_family_name
  if(!$name){$name='Game-'+([int]$Game.index).ToString('000')+'-'+[string]$Game.name}
@@ -9,11 +10,12 @@ function Ensure-GuiFolder([string]$Path){
  if(!(Test-Path -LiteralPath $Path)){$null=New-PrivateFolder $Path}
  return $Path
 }
-function New-GuiGameRun($Game,[string]$Category){
+function New-GuiGameRun($Game,[string]$Category,$Receipt=$null){
  $gamesRoot=Ensure-GuiFolder (Join-Path $script:DataRoot 'Games')
  $familyRoot=Ensure-GuiFolder (Join-Path $gamesRoot (Get-GuiFamilyName $Game))
  $categoryRoot=Ensure-GuiFolder (Join-Path $familyRoot $Category)
- New-PrivateFolder (Join-Path $categoryRoot ([DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss-fff')+'-'+[guid]::NewGuid().ToString('N').Substring(0,8)))
+ $name=if($Category -eq 'Receipts' -and $Receipt){Get-GuiReceiptFolderName $Receipt}else{[DateTime]::Now.ToString('yyyy-MM-dd HH-mm-ss')}
+ New-GuiOutputFolder $categoryRoot $name
 }
 function New-PoCRun([int]$GameId){
  $catalog=@((Get-Content (Join-Path $script:Root 'games.json') -Raw|ConvertFrom-Json).games)
@@ -34,6 +36,7 @@ function Initialize-GuiStorage {
  if(!(Test-Path -LiteralPath $script:DataRoot)){$null=New-PrivateFolder $script:DataRoot}
  $acl=[IO.Directory]::GetAccessControl($script:DataRoot)
  if(!$acl.AreAccessRulesProtected){throw 'The private application folder has unexpected permissions.'}
+ Move-LegacyGuiReceiptFolders
 }
 function Send-GuiEvent([string]$Kind,$Fields){
  $row=[ordered]@{kind=$Kind;utc=[DateTime]::UtcNow.ToString('o')}
@@ -91,18 +94,18 @@ function Find-ReceiptGame([string]$Path,$Games){
  return $matches[0]
 }
 function Save-ReceiptProof($Game,$Receipt,[string]$Origin,[string]$Run){
- $proof=[ordered]@{gameId=[int]$Game.index;path=$Receipt.Path;sha256=$Receipt.Hash;origin=$Origin;signatureVerified=($Origin -eq 'loaded');mintedUtc=$Receipt.Minted.ToString('o');expiresUtc=$Receipt.Expires.ToString('o');storeAccount=$script:StoreAccount}
+ $proof=[ordered]@{gameId=[int]$Game.index;path=$Receipt.Path;sha256=$Receipt.Hash;origin=$Origin;signatureVerified=($Origin -eq 'loaded');licenseType=(Get-GuiReceiptType $Receipt);mintedUtc=$Receipt.Minted.ToString('o');expiresUtc=$Receipt.Expires.ToString('o');storeAccount=$script:StoreAccount}
  $path=Join-Path $Run 'receipt-proof-private.json'
  $proof|ConvertTo-Json|Set-Content -LiteralPath $path -Encoding UTF8
- [pscustomobject]@{gameId=[int]$Game.index;path=$Receipt.Path;proofPath=$path;origin=$Origin;mintedUtc=$proof.mintedUtc;expiresUtc=$proof.expiresUtc}
+ [pscustomobject]@{gameId=[int]$Game.index;path=$Receipt.Path;proofPath=$path;origin=$Origin;licenseType=$proof.licenseType;mintedUtc=$proof.mintedUtc;expiresUtc=$proof.expiresUtc}
 }
 function Read-TrustedGuiReceipt([string]$ProofPath,$Game){
- $full=[IO.Path]::GetFullPath($ProofPath)
+ $full=Resolve-GuiSavedReceiptPath $ProofPath
  $root=[IO.Path]::GetFullPath($script:DataRoot).TrimEnd('\')+'\'
  if(!$full.StartsWith($root,[StringComparison]::OrdinalIgnoreCase)){throw 'Receipt validation record is outside the private application folder.'}
  $proof=Get-Content -LiteralPath $full -Raw|ConvertFrom-Json
  if($proof.gameId -ne $Game.index -or $proof.origin -notin @('minted','loaded') -or ($proof.origin -eq 'loaded' -and !$proof.signatureVerified)){throw 'Receipt validation record does not match this game.'}
- $receiptPath=[IO.Path]::GetFullPath([string]$proof.path)
+ $receiptPath=Resolve-GuiSavedReceiptPath ([string]$proof.path)
  if(!$receiptPath.StartsWith($root,[StringComparison]::OrdinalIgnoreCase)){throw 'Saved receipt is outside the private application folder.'}
  if((Get-ResearchFileHash $receiptPath).Hash -ine $proof.sha256){throw 'The saved receipt has changed. Load it again before use.'}
  # A loaded receipt was signature-checked on import; an app-minted receipt came directly from the Store response.
@@ -112,6 +115,7 @@ function Read-TrustedGuiReceipt([string]$ProofPath,$Game){
  return $receipt
 }
 function Import-GuiReceipt([string]$Path,$Games){
+ $Path=Resolve-GuiSavedReceiptPath $Path
  Set-GuiStage 'Checking receipt signature and expiry…' 2
  $game=Find-ReceiptGame $Path $Games
  $script:TrustedReceiptHash=$null
@@ -126,7 +130,9 @@ function Import-GuiReceipt([string]$Path,$Games){
   $script:TrustedReceiptHash=$null;$receipt=Read-Receipt $target $game
  }elseif((Get-ResearchFileHash $target).Hash -ine $receipt.Hash){throw 'Receipt copy did not match the validated file.'}
  $receipt.Path=$target
+ $run=Complete-GuiReceiptFolder $run $receipt
  Send-GuiLog 'Microsoft receipt signature verified.'
+ Send-GuiLog ('Receipt license type: '+$receipt.LicenseType+'.')
  Send-GuiLog ($game.name+' selected from receipt XML.')
  Send-GuiLog ('Receipt valid until '+(Format-Time $receipt.Expires)+'.')
  [pscustomobject]@{installed=[bool](Get-GuiInstalledPackage $game);receipt=(Save-ReceiptProof $game $receipt 'loaded' $run);run=$run;message='Receipt loaded'}
@@ -141,6 +147,8 @@ function Get-GuiFreshReceipt($Game){
  $run=New-PoCRun $Game.index
  $receipt=Request-GameReceipt $Game $run
  if(!$receipt.Valid){throw 'The Store returned a receipt outside its 24-hour validity window.'}
+ $run=Complete-GuiReceiptFolder $run $receipt
+ Send-GuiLog ('Receipt license type: '+$receipt.LicenseType+'.')
  Send-GuiLog ('Receipt issued '+(Format-Time $receipt.Minted)+'.')
  Send-GuiLog ('Receipt expires '+(Format-Time $receipt.Expires)+'.')
  [pscustomobject]@{receipt=(Save-ReceiptProof $Game $receipt 'minted' $run);run=$run;message='Receipt saved'}
@@ -246,7 +254,7 @@ function Get-AllGuiReceipts($Games,[string]$CancelPath){
    try{
     $receipt=Request-GameReceipt $game $staging
     if(!$receipt.Valid){throw 'Store receipt is outside its 24-hour validity window.'}
-    $run=New-GuiGameRun $game 'Receipts'
+    $run=New-GuiGameRun $game 'Receipts' $receipt
     $destination=Join-Path $run 'pop.bin'
     Move-Item -LiteralPath $receipt.Path -Destination $destination -ErrorAction Stop
     $receipt.Path=$destination
@@ -254,7 +262,7 @@ function Get-AllGuiReceipts($Games,[string]$CancelPath){
     if(Test-Path -LiteralPath $diagnostic){Move-Item -LiteralPath $diagnostic -Destination (Join-Path $run 'receipt-result.json') -ErrorAction Stop}
     $dto=Save-ReceiptProof $game $receipt 'minted' $run
     $saved++;$entries+=,[ordered]@{gameId=$game.index;game=$game.name;status='saved';receipt=$dto}
-    Send-GuiLog ($game.name+': receipt saved.')
+    Send-GuiLog ($game.name+': '+(Get-GuiReceiptType $receipt)+' receipt saved.')
    }catch{
     if($_.Exception.Data['ReceiptRetryAfterSeconds']){$throttled=$true;$retryAfterSeconds=[int]$_.Exception.Data['ReceiptRetryAfterSeconds']}
     if($_.Exception.Message.StartsWith('No license for this game/edition')){$denied++;$state='unlicensed';Send-GuiLog ($game.name+': no entitlement on this account.')}

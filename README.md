@@ -8,13 +8,13 @@ By **Alec Breen | TheBreenis**.
 
 *App preview with example account details.*
 
-Download **GFW8 License Grabber.exe** from [Releases](https://github.com/thebreenis/gfw8-license-grabber/releases/latest). The single executable includes its backend; no adjacent files or Python installation are needed to run it. Current versions: **GUI 1.9.0 / CLI 1.5.0**, including receipt sharing; see the [sharing guide](docs/SHARING.md).
+Download the versioned `GFW8 License Grabber v<version>.exe` from [Releases](https://github.com/thebreenis/gfw8-license-grabber/releases/latest). The single executable includes its backend; no adjacent files or Python installation are needed to run it. Current source versions: **GUI 1.10.1 / CLI 1.6.1**, including receipt sharing; see the [sharing guide](docs/SHARING.md).
 
-Prefer CMD? Download the separate **[GFW8LG-CLI.exe v1.5.0](https://github.com/thebreenis/gfw8-license-grabber/releases/tag/cli-v1.5.0)**. It offers a cyan/purple/green interactive menu, the same 108-game backend and safeguards, and scriptable commands:
+Prefer CMD? Download the separate versioned CLI executable from [Releases](https://github.com/thebreenis/gfw8-license-grabber/releases). It offers a cyan/purple/green interactive menu, the same 108-game backend and safeguards, and scriptable commands:
 
 ```cmd
-GFW8LG-CLI.exe --game "Dragon Mania Legends" --receipt --token
-GFW8LG-CLI.exe --bulk
+"GFW8LG-CLI v1.6.1.exe" --game "Dragon Mania Legends" --receipt --token
+"GFW8LG-CLI v1.6.1.exe" --bulk
 ```
 
 See the [CLI guide](docs/CLI.md) for receipt import, Presence, cancellation, exit codes, and offline demo mode. Both editions are single executables; close one before starting the other.
@@ -55,7 +55,7 @@ Install Python 3.10+ and run on Windows x64:
 python tools/build.py
 ```
 
-The standard-library-only builder creates `dist/GFW8 License Grabber.exe` and `dist/GFW8LG-CLI.exe`, checks route metadata and runtime hashes, and verifies both embedded bundles. It uses the Windows .NET Framework C# compiler and includes the checked-in native helper/runtime dependencies. All paths are relative to the checkout. Use `python tools/build.py --cli-only` to build only the console edition.
+The standard-library-only builder creates `dist/GFW8 License Grabber v<GUI_VERSION>.exe` and `dist/GFW8LG-CLI v<CLI_VERSION>.exe`, fills and verifies Windows file/product details from VERSION and CLI_VERSION, checks route metadata and runtime hashes, and verifies both embedded bundles. It uses the Windows .NET Framework C# compiler and includes the checked-in native helper/runtime dependencies. All paths are relative to the checkout. Use `python tools/build.py --cli-only` to build only the console edition.
 
 To rebuild the native x86 helper as well, install Visual Studio C++ Build Tools and a Windows SDK with C++/WinRT headers:
 

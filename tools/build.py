@@ -12,6 +12,7 @@ import xml.etree.ElementTree as ET
 import zipfile
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import sharing_build
+import exe_metadata
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -110,12 +111,14 @@ def main():
     automation = windows / 'Microsoft.NET/assembly/GAC_MSIL/System.Management.Automation/v4.0_3.0.0.0__31bf3856ad364e35/System.Management.Automation.dll'
     dist = ROOT / 'dist'
     dist.mkdir(exist_ok=True)
-    exe = dist / 'GFW8 License Grabber.exe'
+    exe = dist / f'GFW8 License Grabber v{version}.exe'
+    gui_info = exe_metadata.assembly_info(ROOT / 'build/GuiAssemblyInfo.cs', 'GFW8 License Grabber',
+                                         'Windows 8 game receipt and Xbox token utility', version)
     if not args.cli_only:
         subprocess.run([str(csc), '/nologo', '/target:winexe', '/platform:x64', '/optimize+',
                     '/win32icon:' + str(stage / 'App.ico'), '/reference:System.Windows.Forms.dll',
                     '/reference:System.IO.Compression.dll', '/reference:' + str(automation),
-                    '/resource:' + str(payload) + ',GFW8.Payload', '/out:' + str(exe), str(stage / 'Launcher.cs')], check=True)
+                    '/resource:' + str(payload) + ',GFW8.Payload', '/out:' + str(exe), str(stage / 'Launcher.cs'), str(gui_info)], check=True)
         subprocess.run([str(exe), '--verify-bundle', str(ROOT / 'build/embedded-verification.json')], check=True)
         assert json.loads((ROOT / 'build/embedded-verification.json').read_text())['bundleVerified']
     cli_version = (ROOT / 'CLI_VERSION').read_text().strip()
@@ -123,20 +126,25 @@ def main():
     cli_source = ROOT / 'build/CliProgram.cs'
     cli_source.write_text((ROOT / 'src/cli/Program.cs').read_text(encoding='utf-8-sig').replace('__CLI_VERSION__', cli_version), encoding='utf-8')
     cli_payload = ROOT / 'build/cli-payload.zip'
-    cli_names = {'Worker.ps1', 'GuiBackend.ps1', 'InstalledGames.ps1', 'LegacyPackageRecovery.ps1', 'InstalledGameHost.cs', 'GFW8LG-Agent.exe', 'sharing-relay.json', 'ReceiptInstaller.ps1', 'ReceiptArchives.ps1'}
+    cli_names = {'Worker.ps1', 'GuiBackend.ps1', 'InstalledGames.ps1', 'LegacyPackageRecovery.ps1', 'InstalledGameHost.cs', 'GFW8LG-Agent.exe', 'sharing-relay.json', 'ReceiptInstaller.ps1', 'ReceiptArchives.ps1', 'ReceiptStorage.ps1'}
     with zipfile.ZipFile(payload) as source, zipfile.ZipFile(cli_payload, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as target:
         for entry in source.infolist():
             if entry.filename.startswith('backend/') or entry.filename in cli_names:
                 target.writestr(entry, source.read(entry.filename))
-    cli_exe = dist / 'GFW8LG-CLI.exe'
+    cli_exe = dist / f'GFW8LG-CLI v{cli_version}.exe'
+    cli_info = exe_metadata.assembly_info(ROOT / 'build/CliAssemblyInfo.cs', 'GFW8 License Grabber CLI',
+                                         'Command-line Windows 8 game receipt and Xbox token utility', cli_version)
     subprocess.run([str(csc), '/nologo', '/target:exe', '/platform:x64', '/optimize+',
                     '/win32icon:' + str(stage / 'App.ico'), '/reference:System.Windows.Forms.dll',
                     '/reference:System.IO.Compression.dll', '/reference:System.Web.Extensions.dll',
                     '/reference:System.Security.dll', '/resource:' + str(cli_payload) + ',GFW8.Payload', '/out:' + str(cli_exe), str(cli_source),
-                    str(ROOT / 'src/cli/Sharing.cs'), str(ROOT / 'src/sharing/ShareCrypto.cs'), str(ROOT / 'src/sharing/ShareClient.cs')], check=True)
+                    str(ROOT / 'src/cli/Sharing.cs'), str(ROOT / 'src/sharing/ShareCrypto.cs'), str(ROOT / 'src/sharing/ShareClient.cs'), str(cli_info)], check=True)
     subprocess.run([str(cli_exe), '--verify-bundle', str(ROOT / 'build/cli-embedded-verification.json')], check=True)
     assert json.loads((ROOT / 'build/cli-embedded-verification.json').read_text())['bundleVerified']
     built = [cli_exe] if args.cli_only else [exe, cli_exe]
+    metadata = ([] if args.cli_only else [exe_metadata.verify(exe, 'GFW8 License Grabber', version)])
+    metadata.append(exe_metadata.verify(cli_exe, 'GFW8 License Grabber CLI', cli_version))
+    (dist / 'FILE-DETAILS.json').write_text(json.dumps(metadata, indent=2) + '\n', encoding='utf-8')
     (dist / 'SHA256SUMS.txt').write_text(''.join(digest(p) + '  ' + p.name + '\n' for p in built), encoding='ascii')
     print(json.dumps({'guiVersion': version, 'cliVersion': cli_version, 'files': [{'file': str(p), 'sha256': digest(p)} for p in built], 'bundlesVerified': True}))
 

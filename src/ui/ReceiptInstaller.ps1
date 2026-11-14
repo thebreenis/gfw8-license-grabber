@@ -42,7 +42,7 @@ function New-ReceiptInstallPlan([string]$Source,$Games,[string]$Run,[string]$Can
    if(!$receipt.SignatureVerified -or !$receipt.Valid){throw 'Receipt expired, has a future date, or has an invalid signature.'}
    $id=[int]$game.index
    if($best.ContainsKey($id)){$script:InstallerDuplicates++}
-   $row=[pscustomobject]@{gameId=$id;game=$game.name;family=$game.package_family_name;installed=[bool]@($packages|Where-Object PackageFamilyName -ieq $game.package_family_name).Count;mintedUtc=$receipt.Minted.ToString('o');expiresUtc=$receipt.Expires.ToString('o');source=$Origin;staged=$staged;sha256=$receipt.Hash;destination=(Get-ReceiptInstallerDestination $game)}
+   $row=[pscustomobject]@{gameId=$id;game=($game.name+$(if($receipt.LicenseType -eq 'Trial'){' [Trial]'}else{''}));licenseType=$receipt.LicenseType;family=$game.package_family_name;installed=[bool]@($packages|Where-Object PackageFamilyName -ieq $game.package_family_name).Count;mintedUtc=$receipt.Minted.ToString('o');expiresUtc=$receipt.Expires.ToString('o');source=$Origin;staged=$staged;sha256=$receipt.Hash;destination=(Get-ReceiptInstallerDestination $game)}
    if(!$best.ContainsKey($id) -or [DateTimeOffset]::Parse($best[$id].mintedUtc) -lt $receipt.Minted){$best[$id]=$row}
   }catch{$issues.Add([pscustomobject]@{source=$Origin;message=$_.Exception.Message})}
  }
@@ -125,7 +125,7 @@ function Install-ReceiptPlan([string]$PlanPath,$Games,[bool]$IncludeUninstalled,
      if(Test-ReceiptInstallerRunning $game){throw 'The game started while installing. Close it and try again.'}
      if(Test-Path -LiteralPath $target){[IO.File]::Replace($temporary,$target,[NullString]::Value)}else{[IO.File]::Move($temporary,$target)}
     }finally{if(Test-Path -LiteralPath $temporary){Remove-Item -LiteralPath $temporary -Force}}
-    $status='installed';$message='Receipt installed.';$installed++
+    $status='installed';$message=(Get-GuiReceiptType $receipt)+' receipt installed.';$installed++
    }catch{$status='error';$message=$_.Exception.Message;$errors++}
    finally{$results+=,[pscustomobject]@{game=$row.game;gameId=$row.gameId;status=$status;message=$message}}
   }
