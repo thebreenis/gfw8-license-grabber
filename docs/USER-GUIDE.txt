@@ -1,4 +1,4 @@
-﻿GFW8 License Grabber - GUI v1.10.1
+﻿GFW8 License Grabber - GUI v1.10.2
 By Alec Breen | TheBreenis
 https://github.com/thebreenis
 

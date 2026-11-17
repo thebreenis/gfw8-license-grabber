@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "components": [
+    {
+      "path": "backend/runtime/archive-tools/7za.exe",
+      "sha256": "dd3757f31c97e33776f2590317d4fb12f2da075db3dbb1e3f94d0f2a01d84ffa",
+      "bytes": 1328640,
+      "origin": "Official 7-Zip Extra 26.06, x64/7za.exe; independently matched byte-for-byte during the 2026-11-14 audit",
+      "reference": "https://github.com/ip7z/7zip/releases/tag/26.06",
+      "requireMicrosoftSignature": false
+    },
+    {
+      "path": "backend/runtime/jetpack-auth-investigation/shared-auth-helper/Microsoft.Xbox.dll",
+      "sha256": "98dc11c38384a4a031b75c7bf0ecaf25ae95ceee956afcc6bb51bc337fba3b66",
+      "bytes": 4028000,
+      "origin": "Original legacy Microsoft Xbox/VC++ payload; valid Microsoft Authenticode signatures verified in the 2026-11-14 audit; no independent public download URL recorded",
+      "reference": "THIRD-PARTY-NOTICES.md",
+      "requireMicrosoftSignature": true
+    },
+    {
+      "path": "backend/runtime/jetpack-auth-investigation/shared-auth-helper/msvcp110.dll",
+      "sha256": "c8d5572ca8d7624871188f0acabc3ae60d4c5a4f6782d952b9038de3bc28b39a",
+      "bytes": 535008,
+      "origin": "Original legacy Microsoft Xbox/VC++ payload; valid Microsoft Authenticode signatures verified in the 2026-11-14 audit; no independent public download URL recorded",
+      "reference": "THIRD-PARTY-NOTICES.md",
+      "requireMicrosoftSignature": true
+    },
+    {
+      "path": "backend/runtime/jetpack-auth-investigation/shared-auth-helper/msvcr110.dll",
+      "sha256": "b30160e759115e24425b9bcdf606ef6ebce4657487525ede7f1ac40b90ff7e49",
+      "bytes": 875472,
+      "origin": "Original legacy Microsoft Xbox/VC++ payload; valid Microsoft Authenticode signatures verified in the 2026-11-14 audit; no independent public download URL recorded",
+      "reference": "THIRD-PARTY-NOTICES.md",
+      "requireMicrosoftSignature": true
+    },
+    {
+      "path": "backend/runtime/jetpack-auth-investigation/shared-auth-helper/Probe.exe",
+      "sha256": "e16ed76d2a83b9752eae643a00723b1a3051c6c9eb69a58e53c8c73e528fdf72",
+      "bytes": 367616,
+      "origin": "Project-built native helper; reconstructs from the shipped C++ source except PE timestamp fields in the audited historical build",
+      "reference": "src/native/PackagedPayloadAsync.cpp",
+      "requireMicrosoftSignature": false,
+      "sourceHashes": {
+        "src/native/PackagedPayloadAsync.cpp": "81cd25ba2249ef1529218ba25ba33f8c2f5dcdffae6a031735abddcba817f85f"
+      }
+    },
+    {
+      "path": "backend/runtime/jetpack-auth-investigation/shared-auth-helper/sdk-win81/Microsoft.Xbox.dll",
+      "sha256": "03cd055967732fa2c8e3c191f2326e33c70c0b2869b519982b627b77d115f742",
+      "bytes": 4147376,
+      "origin": "Original legacy Microsoft Xbox/VC++ payload; valid Microsoft Authenticode signatures verified in the 2026-11-14 audit; no independent public download URL recorded",
+      "reference": "THIRD-PARTY-NOTICES.md",
+      "requireMicrosoftSignature": true
+    },
+    {
+      "path": "backend/runtime/jetpack-auth-investigation/shared-auth-helper/sdk-win81/msvcp120_app.dll",
+      "sha256": "9616782a8700153dfa70f1307959dcfa26f4907f1971ffcb4f4c87131a20efc8",
+      "bytes": 461104,
+      "origin": "Original legacy Microsoft Xbox/VC++ payload; valid Microsoft Authenticode signatures verified in the 2026-11-14 audit; no independent public download URL recorded",
+      "reference": "THIRD-PARTY-NOTICES.md",
+      "requireMicrosoftSignature": true
+    },
+    {
+      "path": "backend/runtime/jetpack-auth-investigation/shared-auth-helper/sdk-win81/msvcr120_app.dll",
+      "sha256": "67704e56e361116e0f78ca69e72c76a96ed4b65f2b737ad16b95851559d850ac",
+      "bytes": 836288,
+      "origin": "Original legacy Microsoft Xbox/VC++ payload; valid Microsoft Authenticode signatures verified in the 2026-11-14 audit; no independent public download URL recorded",
+      "reference": "THIRD-PARTY-NOTICES.md",
+      "requireMicrosoftSignature": true
+    },
+    {
+      "path": "backend/runtime/standalone-receipt-tool/receipt-public.cer",
+      "sha256": "1f275c8bbe9f4bb6c180a8a0080eb5a05aa50ad57cfef086b060e5a759210759",
+      "bytes": 1398,
+      "origin": "Public Microsoft receipt-signature verification certificate; no private key",
+      "reference": "THIRD-PARTY-NOTICES.md",
+      "requireMicrosoftSignature": false
+    },
+    {
+      "path": "third-party/7zip/7z2606-src.tar.xz",
+      "sha256": "a4e374c8f864f51df48c2cfd0e1413ec3b2ea030deae852d6a655402ebb61ac4",
+      "bytes": 1567328,
+      "origin": "Exact official 7-Zip 26.06 source archive",
+      "reference": "https://github.com/ip7z/7zip/releases/download/26.06/7z2606-src.tar.xz",
+      "requireMicrosoftSignature": false
+    }
+  ]
+}

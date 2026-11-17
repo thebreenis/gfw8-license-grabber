@@ -19,6 +19,10 @@ using Gfw8Sharing;
 
 [assembly:System.Reflection.AssemblyTitle("GFW8LG Receipt Sharing Agent")]
 [assembly:System.Reflection.AssemblyCompany("Alec Breen | TheBreenis")]
+[assembly:System.Reflection.AssemblyProduct("GFW8LG Receipt Sharing Agent")]
+[assembly:System.Reflection.AssemblyDescription("Optional receipt sharing background agent")]
+[assembly:System.Reflection.AssemblyCopyright("Copyright © 2026 Alec Breen | TheBreenis")]
+[assembly:System.Reflection.AssemblyInformationalVersion("1.2.0")]
 [assembly:System.Reflection.AssemblyVersion("1.2.0.0")]
 [assembly:System.Reflection.AssemblyFileVersion("1.2.0.0")]
 sealed partial class ReceiptAgent {

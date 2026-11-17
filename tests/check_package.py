@@ -11,6 +11,10 @@ spec = importlib.util.spec_from_file_location('project_build', ROOT / 'tools/bui
 module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
 module.validate_routes()
+import package_policy
+from deterministic_build import verify_dependencies
+verify_dependencies(ROOT)
+package_policy.inputs(ROOT, 'source')
 version = (ROOT / 'VERSION').read_text().strip()
 assert re.fullmatch(r'\d+\.\d+\.\d+', version)
 for folder in ('src', 'backend', 'tools', 'tests', 'docs', 'relay'):
@@ -26,6 +30,19 @@ payload = ROOT / 'build/gui-payload.zip'
 if payload.exists():
     with zipfile.ZipFile(payload) as archive:
         assert archive.testzip() is None
+        import runtime_layout
+        expected_backend = {'backend/' + '/'.join(runtime_layout.NAMES.get(part, part) for part in Path(name).parts[1:])
+                            for name in package_policy.manifest(ROOT)['backend']}
+        expected_ui = {Path(name).name for name in package_policy.manifest(ROOT)['ui'] if Path(name).name != 'Launcher.cs'}
+        expected = expected_backend | expected_ui | {'README.txt','Sharing.dll','GFW8LG-Agent.exe','sharing-relay.json','sharing-icon.png'}
+        assert set(archive.namelist()) == expected, 'Unexpected or missing GUI bundle member'
+        helper = 'backend/runtime/xbox-auth/shared-auth-helper/'
+        inventory = json.loads(archive.read(helper + 'payload-inventory.json').decode('utf-8-sig'))
+        for component in inventory:
+            name = helper + component['path'].replace('\\', '/')
+            assert hashlib.sha256(archive.read(name)).hexdigest() == component['sha256'].lower(), name
+        native_hash = hashlib.sha256(archive.read(helper + 'Probe.exe')).hexdigest().upper()
+        assert native_hash in archive.read('backend/runtime/xbox-auth/AcquireXboxToken.ps1').decode('utf-8-sig')
         assert len(json.loads(archive.read('backend/games.json').decode('utf-8-sig'))['games']) == 108
         assert f'Text="v{version}"' in archive.read('MainWindow.xaml').decode()
         assert 'backend/runtime/xbox-auth/AcquireXboxToken.ps1' in archive.namelist()

@@ -12,7 +12,13 @@ call "%VSROOT%\VC\Auxiliary\Build\vcvars32.bat" >nul
 if errorlevel 1 exit /b 1
 if not exist "%REPOROOT%\build\native" mkdir "%REPOROOT%\build\native"
 pushd "%REPOROOT%\build\native"
-cl /nologo /std:c++20 /EHsc /MT /O2 "%REPOROOT%\src\native\PackagedPayloadAsync.cpp" /Fe:Probe.exe /link /APPCONTAINER /SUBSYSTEM:WINDOWS /ENTRY:wmainCRTStartup windowsapp.lib ole32.lib oleaut32.lib
+copy /y "%REPOROOT%\src\native\PackagedPayloadAsync.cpp" PackagedPayloadAsync.cpp >nul
+if errorlevel 1 (popd & exit /b 1)
+>toolchain.txt echo VCToolsVersion=%VCToolsVersion%
+>>toolchain.txt echo WindowsSDKVersion=%WindowsSDKVersion%
+where cl.exe >>toolchain.txt
+where link.exe >>toolchain.txt
+cl /nologo /std:c++20 /EHsc /MT /O2 /Brepro PackagedPayloadAsync.cpp /Fe:Probe.exe /link /Brepro /APPCONTAINER /SUBSYSTEM:WINDOWS /ENTRY:wmainCRTStartup windowsapp.lib ole32.lib oleaut32.lib
 set "BUILDRESULT=%ERRORLEVEL%"
 popd
 exit /b %BUILDRESULT%

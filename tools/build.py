@@ -13,6 +13,8 @@ import zipfile
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import sharing_build
 import exe_metadata
+import package_policy
+from deterministic_build import Compiler, verify_dependencies, powershell_records
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -61,12 +63,23 @@ def main():
     if os.name != 'nt':
         sys.exit('Build on Windows 10/11 x64 with .NET Framework and Windows PowerShell 5.1.')
     validate_routes()
+    dependencies = verify_dependencies(ROOT)
+    compiler = Compiler(ROOT)
     version = (ROOT / 'VERSION').read_text().strip()
     assert re.fullmatch(r'\d+\.\d+\.\d+', version)
     stage = ROOT / 'build/staging'
+    if stage.exists():
+        # Only this fixed build-owned directory can be cleared; reject redirected paths.
+        if stage.resolve() != ROOT.resolve() / 'build/staging':
+            raise RuntimeError('Build staging path is redirected; refusing to clear it.')
+        shutil.rmtree(stage)
     stage.mkdir(parents=True, exist_ok=True)
-    shutil.copytree(ROOT / 'backend', stage / 'backend', dirs_exist_ok=True)
-    for file in (ROOT / 'src/ui').iterdir():
+    for file in package_policy.inputs(ROOT, 'backend'):
+        destination = stage / file.relative_to(ROOT)
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(file, destination)
+    ui_inputs = package_policy.inputs(ROOT, 'ui')
+    for file in ui_inputs:
         if file.suffix == '.ico':
             shutil.copy2(file, stage / file.name)
             continue
@@ -77,6 +90,7 @@ def main():
             text = re.sub(r'(x:Name="AppVersion" Text=")v[^"]+', r'\g<1>v' + version, text)
         (stage / file.name).write_text(text, encoding='utf-8-sig' if file.suffix == '.ps1' else 'utf-8')
     shutil.copy2(ROOT / 'docs/USER-GUIDE.txt', stage / 'README.txt')
+    native_build = None
     if args.rebuild_native:
         subprocess.run(['cmd.exe', '/c', str(ROOT / 'tools/build-native.cmd')], check=True)
         helper = stage / 'backend/runtime/jetpack-auth-investigation'
@@ -90,24 +104,29 @@ def main():
         rows = json.loads(inventory.read_text(encoding='utf-8-sig'))
         next(row for row in rows if row['path'] == 'Probe.exe')['sha256'] = new_hash.lower()
         inventory.write_text(json.dumps(rows, indent=2) + '\n', encoding='utf-8-sig')
+        lines = (ROOT / 'build/native/toolchain.txt').read_text().splitlines()
+        tool_paths = [Path(line.strip()) for line in lines if line.lower().strip().endswith('.exe')]
+        tools = powershell_records(tool_paths)
+        for path, tool in zip(tool_paths, tools):
+            if tool['signature'] != 'Valid' or 'O=Microsoft Corporation' not in (tool['signer'] or ''):
+                raise RuntimeError('Native compiler/linker signature validation failed.')
+            tool['sha256'] = digest(path)
+        native_build = {'environment':lines[:2], 'tools':tools, 'sourceArgument':'PackagedPayloadAsync.cpp',
+                        'compilerFlags':['/std:c++20','/EHsc','/MT','/O2','/Brepro'],
+                        'linkerFlags':['/Brepro','/APPCONTAINER','/SUBSYSTEM:WINDOWS','/ENTRY:wmainCRTStartup'],
+                        'probeSha256':new_hash.lower()}
     import runtime_layout
     runtime_files = runtime_layout.prepare(ROOT, stage)
-    sharing_files = sharing_build.build(ROOT, stage)
+    sharing_files = sharing_build.build(ROOT, stage, compiler)
     payload = ROOT / 'build/gui-payload.zip'
     # Enumerate source-owned files only; test results in staging are never embedded.
-    files = [stage / p.name for p in (ROOT / 'src/ui').iterdir() if p.name != 'Launcher.cs']
+    files = [stage / p.name for p in ui_inputs if p.name != 'Launcher.cs']
     files += [stage / 'README.txt'] + sharing_files
     files += runtime_files
-    with zipfile.ZipFile(payload, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
-        for file in sorted(files):
-            assert file.name.lower() not in ('pop.bin', 'issued-token.xml', 'native-token.txt', 'request-private.json', 'registration.lock', 'appxmanifest.xml')
-            info = zipfile.ZipInfo(file.relative_to(stage).as_posix(), (2026, 1, 1, 0, 0, 0))
-            info.compress_type = zipfile.ZIP_DEFLATED
-            archive.writestr(info, file.read_bytes())
+    package_policy.write_zip(payload, {file.relative_to(stage).as_posix(): file.read_bytes() for file in files})
     with zipfile.ZipFile(payload) as archive:
         assert archive.testzip() is None
     windows = Path(os.environ.get('WINDIR', r'C:\Windows'))
-    csc = windows / 'Microsoft.NET/Framework64/v4.0.30319/csc.exe'
     automation = windows / 'Microsoft.NET/assembly/GAC_MSIL/System.Management.Automation/v4.0_3.0.0.0__31bf3856ad364e35/System.Management.Automation.dll'
     dist = ROOT / 'dist'
     dist.mkdir(exist_ok=True)
@@ -115,10 +134,9 @@ def main():
     gui_info = exe_metadata.assembly_info(ROOT / 'build/GuiAssemblyInfo.cs', 'GFW8 License Grabber',
                                          'Windows 8 game receipt and Xbox token utility', version)
     if not args.cli_only:
-        subprocess.run([str(csc), '/nologo', '/target:winexe', '/platform:x64', '/optimize+',
-                    '/win32icon:' + str(stage / 'App.ico'), '/reference:System.Windows.Forms.dll',
-                    '/reference:System.IO.Compression.dll', '/reference:' + str(automation),
-                    '/resource:' + str(payload) + ',GFW8.Payload', '/out:' + str(exe), str(stage / 'Launcher.cs'), str(gui_info)], check=True)
+        compiler.compile(['/target:winexe', '/win32icon:' + str(stage / 'App.ico'),
+                    '/resource:' + str(payload) + ',GFW8.Payload', '/out:' + str(exe), str(stage / 'Launcher.cs'), str(gui_info)],
+                    ['System.Windows.Forms.dll', 'System.IO.Compression.dll', str(automation)])
         subprocess.run([str(exe), '--verify-bundle', str(ROOT / 'build/embedded-verification.json')], check=True)
         assert json.loads((ROOT / 'build/embedded-verification.json').read_text())['bundleVerified']
     cli_version = (ROOT / 'CLI_VERSION').read_text().strip()
@@ -134,11 +152,10 @@ def main():
     cli_exe = dist / f'GFW8LG-CLI v{cli_version}.exe'
     cli_info = exe_metadata.assembly_info(ROOT / 'build/CliAssemblyInfo.cs', 'GFW8 License Grabber CLI',
                                          'Command-line Windows 8 game receipt and Xbox token utility', cli_version)
-    subprocess.run([str(csc), '/nologo', '/target:exe', '/platform:x64', '/optimize+',
-                    '/win32icon:' + str(stage / 'App.ico'), '/reference:System.Windows.Forms.dll',
-                    '/reference:System.IO.Compression.dll', '/reference:System.Web.Extensions.dll',
-                    '/reference:System.Security.dll', '/resource:' + str(cli_payload) + ',GFW8.Payload', '/out:' + str(cli_exe), str(cli_source),
-                    str(ROOT / 'src/cli/Sharing.cs'), str(ROOT / 'src/sharing/ShareCrypto.cs'), str(ROOT / 'src/sharing/ShareClient.cs'), str(cli_info)], check=True)
+    compiler.compile(['/target:exe', '/win32icon:' + str(stage / 'App.ico'),
+                    '/resource:' + str(cli_payload) + ',GFW8.Payload', '/out:' + str(cli_exe), str(cli_source),
+                    str(ROOT / 'src/cli/Sharing.cs'), str(ROOT / 'src/sharing/ShareCrypto.cs'), str(ROOT / 'src/sharing/ShareClient.cs'), str(cli_info)],
+                    ['System.Windows.Forms.dll','System.IO.Compression.dll','System.Web.Extensions.dll','System.Security.dll'])
     subprocess.run([str(cli_exe), '--verify-bundle', str(ROOT / 'build/cli-embedded-verification.json')], check=True)
     assert json.loads((ROOT / 'build/cli-embedded-verification.json').read_text())['bundleVerified']
     built = [cli_exe] if args.cli_only else [exe, cli_exe]
@@ -146,6 +163,13 @@ def main():
     metadata.append(exe_metadata.verify(cli_exe, 'GFW8 License Grabber CLI', cli_version))
     (dist / 'FILE-DETAILS.json').write_text(json.dumps(metadata, indent=2) + '\n', encoding='utf-8')
     (dist / 'SHA256SUMS.txt').write_text(''.join(digest(p) + '  ' + p.name + '\n' for p in built), encoding='ascii')
+    provenance = {'guiVersion':version, 'cliVersion':cli_version, **compiler.provenance(),
+                  'inputs': package_policy.hashes(ROOT, 'source'), 'dependencies': dependencies,
+                  'artifacts': {p.name:digest(p) for p in built},
+                  'payloads': {p.name:digest(p) for p in (payload, cli_payload, ROOT / 'build/agent-payload.zip')},
+                  'nativeRebuilt':args.rebuild_native, 'nativeBuild':native_build,
+                  'selectedNativeHelperSha256':digest(stage / 'backend/runtime/xbox-auth/shared-auth-helper/Probe.exe')}
+    (dist / 'BUILD-PROVENANCE.json').write_text(json.dumps(provenance, indent=2) + '\n', encoding='utf-8')
     print(json.dumps({'guiVersion': version, 'cliVersion': cli_version, 'files': [{'file': str(p), 'sha256': digest(p)} for p in built], 'bundlesVerified': True}))
 
 
