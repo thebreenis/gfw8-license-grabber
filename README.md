@@ -8,7 +8,7 @@ By **Alec Breen | TheBreenis**.
 
 *App preview with example account details.*
 
-Download the versioned `GFW8 License Grabber v<version>.exe` from [Releases](https://github.com/thebreenis/gfw8-license-grabber/releases/latest). The single executable includes its backend; no adjacent files or Python installation are needed to run it. Current source versions: **GUI 1.10.2 / CLI 1.6.2**, including receipt sharing; see the [sharing guide](docs/SHARING.md).
+Download the versioned `GFW8 License Grabber v<version>.exe` from [Releases](https://github.com/thebreenis/gfw8-license-grabber/releases/latest). The single executable includes its backend; no adjacent files or Python installation are needed to run it. Current source versions: **GUI 1.10.3 / CLI 1.6.2**, including receipt sharing; see the [sharing guide](docs/SHARING.md). GUI 1.10.3 guards against development packages with a missing InstallLocation during token-helper inventory.
 
 Prefer CMD? Download the separate versioned CLI executable from [Releases](https://github.com/thebreenis/gfw8-license-grabber/releases). It offers a cyan/purple/green interactive menu, the same 108-game backend and safeguards, and scriptable commands:
 
@@ -65,6 +65,14 @@ python tools/build.py --rebuild-native
 
 The build updates the helper's exact hash pin and payload inventory in staging. The original Microsoft SDK binaries remain hash-checked. Compiler and packaging differences can change the EXE checksum; release checksums identify the published binary.
 
+The separate Token Lab companion is built from the checked-in `token-lab` source:
+
+```powershell
+python token-lab/build.py
+```
+
+It produces `dist/token-lab-v0.1.3/GFW8 Token Lab v0.1.3.exe` and a matching source ZIP.
+
 ## Offline checks
 
 After building:
@@ -72,6 +80,7 @@ After building:
 ```powershell
 powershell.exe -NoProfile -MTA -ExecutionPolicy Bypass -File tests/Test-BulkFolders.ps1
 powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File tests/Test-GamePicker.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File tests/Test-TemporaryNullInstallLocation.ps1
 python tests/check_package.py
 python tests/Test-CLI.py
 ```
@@ -89,6 +98,7 @@ These tests use synthetic receipt outcomes and a local WPF test window. They do 
 | `src/cli` | Standalone console launcher, menus and command-line interface |
 | `src/metadata` | Retained manifests and additional-route provenance |
 | `backend` | Receipt/token backend, catalogue and required runtime dependencies |
+| `token-lab` | Separate Token Lab GUI, builder and offline tests |
 | `tools` | Portable build scripts |
 | `tests` | Offline regression checks |
 | `docs` | User guide and sanitized validation records |

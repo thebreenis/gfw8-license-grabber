@@ -1,5 +1,6 @@
 /build/
 /dist/
+/token-lab/build/
 node_modules/
 .wrangler/
 .dev.vars*
