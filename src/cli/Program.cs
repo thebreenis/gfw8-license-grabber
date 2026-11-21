@@ -278,7 +278,7 @@ static partial class Program {
    Tile("TOKEN", ConsoleColor.DarkMagenta); Line("  4 Get Xbox token  9 Copy token XML");
    Tile("PRESENCE", ConsoleColor.DarkGreen); Line("  5 Test Presence + Last Played");
    Line("  6 Bulk receipts  7 Open saved files  8 Account/status");
-   Line("  I Install receipts   S Receipt sharing  L Save activity log  0 Exit");
+   Line("  I Install receipts   L Save activity log  0 Exit");
    string choice = Prompt("Choose:"); if (choice == null || choice == "0") return 0;
    try {
     switch (choice.Trim().ToLowerInvariant()) {
@@ -292,7 +292,6 @@ static partial class Program {
      case "8": Account(); Status(); break;
      case "9": CopyToken(); break;
      case "l": SaveLog(); break;
-     case "s": SharingMenu(); break;
      case "i": InstallReceipts(); break;
      default: Line("  Choose one of the menu options.", ConsoleColor.Yellow); break;
     }
@@ -319,7 +318,7 @@ static partial class Program {
   Line("  --token                    Use the receipt acquired/imported in this run");
   Line("  --presence                 Test Presence + Last Played after --token");
   Line("  --bulk                     Receipts only for all 108 games; Ctrl+C cancels");
-  Line("  --sharing                  Pair, browse and pull receipts; background options\n  --status                   Read-only installation status for selected game");
+  Line("  --status                   Read-only installation status for selected game");
   Line("  --version  --help  --no-color  --demo\n");
   Line("  Examples:");
   Line("    \"GFW8LG-CLI v" + Version + ".exe\" --game 26 --receipt --token");
@@ -349,13 +348,12 @@ static partial class Program {
    if (colour) { Console.BackgroundColor = ConsoleColor.Black; Console.ForegroundColor = ConsoleColor.White; }
    if (args.Contains("--version")) { Line("GFW8 License Grabber CLI v" + Version + " | Alec Breen | TheBreenis"); return 0; }
    if (args.Contains("--help") || args.Contains("-h")) { Help(); return 0; }
-   string select = null, import = null, verifyPath = null; bool sharing = false, list = false, getReceipt = false, getToken = false, presence = false, bulk = false, status = false;
+   string select = null, import = null, verifyPath = null; bool list = false, getReceipt = false, getToken = false, presence = false, bulk = false, status = false;
    for (int i = 0; i < args.Length; i++) {
     switch (args[i]) {
      case "--demo": demo = true; break;
      case "--no-color": break;
      case "--list": list = true; break;
-     case "--sharing": sharing = true; break;
      case "--receipt": getReceipt = true; break;
      case "--token": getToken = true; break;
      case "--presence": presence = true; break;
@@ -369,7 +367,6 @@ static partial class Program {
    }
    if (bulk && (getReceipt || getToken || presence || import != null || select != null || status || list)) throw new ArgumentException("--bulk is receipts-only and cannot be combined with game, receipt, token or Presence options.");
    if (getReceipt && import != null) throw new ArgumentException("Choose --receipt or --import.");
-   if (sharing && (bulk || list || getReceipt || getToken || presence || status || select != null || import != null)) throw new ArgumentException("Use --sharing by itself to open the sharing menu.");
    if (presence && !getToken) throw new ArgumentException("--presence requires --token in the same run.");
    if (getToken && !getReceipt && import == null) throw new ArgumentException("Use --receipt or --import with --token.");
    bool acquired;
@@ -383,8 +380,6 @@ static partial class Program {
      Header(); if (select != null && !SelectGame(select)) return 2;
      if (list) { ListGames(); return 0; }
      if (bulk) return Bulk();
-     if (!demo && !status) Gfw8Sharing.ShareClient.AutoStartAsync(runtime);
-     if (sharing) { SharingMenu(); return 0; }
      bool command = getReceipt || import != null || getToken || presence || status;
      if (!command) return Menu();
      if ((getReceipt || status) && select == null && import == null) throw new ArgumentException("Choose --game for this operation.");

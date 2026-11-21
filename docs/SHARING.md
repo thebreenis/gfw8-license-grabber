@@ -1,5 +1,7 @@
 # Receipt sharing
 
+Historical paired-sharing documentation for GUI releases through 1.10.3 and CLI release 1.6.2. New License Grabber builds omit pairing and its background agent.
+
 GUI 1.9.0 and CLI 1.5.0 include a receipt sharing agent, version 1.2.0, by Alec Breen | TheBreenis. Each app remains a single distributable EXE. On first use, it installs its bundled agent into the current Windows user's private app-data folder.
 
 ## Pair and pull

@@ -144,7 +144,7 @@ def main():
     cli_source = ROOT / 'build/CliProgram.cs'
     cli_source.write_text((ROOT / 'src/cli/Program.cs').read_text(encoding='utf-8-sig').replace('__CLI_VERSION__', cli_version), encoding='utf-8')
     cli_payload = ROOT / 'build/cli-payload.zip'
-    cli_names = {'Worker.ps1', 'GuiBackend.ps1', 'InstalledGames.ps1', 'LegacyPackageRecovery.ps1', 'InstalledGameHost.cs', 'GFW8LG-Agent.exe', 'sharing-relay.json', 'ReceiptInstaller.ps1', 'ReceiptArchives.ps1', 'ReceiptStorage.ps1'}
+    cli_names = {'Worker.ps1', 'GuiBackend.ps1', 'InstalledGames.ps1', 'LegacyPackageRecovery.ps1', 'InstalledGameHost.cs', 'ReceiptInstaller.ps1', 'ReceiptArchives.ps1', 'ReceiptStorage.ps1'}
     with zipfile.ZipFile(payload) as source, zipfile.ZipFile(cli_payload, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as target:
         for entry in source.infolist():
             if entry.filename.startswith('backend/') or entry.filename in cli_names:
@@ -153,8 +153,7 @@ def main():
     cli_info = exe_metadata.assembly_info(ROOT / 'build/CliAssemblyInfo.cs', 'GFW8 License Grabber CLI',
                                          'Command-line Windows 8 game receipt and Xbox token utility', cli_version)
     compiler.compile(['/target:exe', '/win32icon:' + str(stage / 'App.ico'),
-                    '/resource:' + str(cli_payload) + ',GFW8.Payload', '/out:' + str(cli_exe), str(cli_source),
-                    str(ROOT / 'src/cli/Sharing.cs'), str(ROOT / 'src/sharing/ShareCrypto.cs'), str(ROOT / 'src/sharing/ShareClient.cs'), str(cli_info)],
+                    '/resource:' + str(cli_payload) + ',GFW8.Payload', '/out:' + str(cli_exe), str(cli_source), str(cli_info)],
                     ['System.Windows.Forms.dll','System.IO.Compression.dll','System.Web.Extensions.dll','System.Security.dll'])
     subprocess.run([str(cli_exe), '--verify-bundle', str(ROOT / 'build/cli-embedded-verification.json')], check=True)
     assert json.loads((ROOT / 'build/cli-embedded-verification.json').read_text())['bundleVerified']
@@ -166,7 +165,7 @@ def main():
     provenance = {'guiVersion':version, 'cliVersion':cli_version, **compiler.provenance(),
                   'inputs': package_policy.hashes(ROOT, 'source'), 'dependencies': dependencies,
                   'artifacts': {p.name:digest(p) for p in built},
-                  'payloads': {p.name:digest(p) for p in (payload, cli_payload, ROOT / 'build/agent-payload.zip')},
+                  'payloads': {p.name:digest(p) for p in (payload, cli_payload)},
                   'nativeRebuilt':args.rebuild_native, 'nativeBuild':native_build,
                   'selectedNativeHelperSha256':digest(stage / 'backend/runtime/xbox-auth/shared-auth-helper/Probe.exe')}
     (dist / 'BUILD-PROVENANCE.json').write_text(json.dumps(provenance, indent=2) + '\n', encoding='utf-8')

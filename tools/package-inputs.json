@@ -127,6 +127,7 @@
     "src/sharing/AgentBundle.cs",
     "src/sharing/AgentOperations.cs",
     "src/sharing/MetroChrome.cs",
+    "src/sharing/ReceiptPaths.cs",
     "src/sharing/ReceiptFolderPicker.cs",
     "src/sharing/ReceiptInstallerWindow.cs",
     "src/sharing/ShareClient.cs",

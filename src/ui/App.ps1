@@ -14,7 +14,7 @@ Add-Type -Path (Join-Path $appRoot 'WindowBounds.cs') -ReferencedAssemblies @([W
 [Gfw8WindowBounds]::Install($window)
 $window.Icon=[Windows.Media.Imaging.BitmapFrame]::Create([Uri](Join-Path $appRoot 'App.ico'))
 $script:ui=@{}
-foreach($name in @('TitleDrag','Minimize','Maximize','Close','GamePicker','AccountEmail','AccountGamertag','ReceiptStatus','ReceiptDetail','ReceiptMinted','ReceiptExpires','ReceiptButton','LoadButton','ReceiptBusy','ReceiptProgress','ReceiptProgressText','ReceiptEta','TokenStatus','TokenDetail','TokenIssued','TokenExpires','TokenButton','TokenBusy','TokenProgress','TokenProgressText','TokenEta','CopyToken','PresenceStatus','PresenceDetail','PresenceButton','PresenceBusy','PresenceProgress','PresenceProgressText','PresenceEta','BulkButton','BulkBusy','BulkProgress','BulkProgressText','BulkSummary','CancelBulk','Activity','CopyLog','SaveLog','GitHub','OpenFiles','Sharing','Installer')){$script:ui[$name]=$window.FindName($name)}
+foreach($name in @('TitleDrag','Minimize','Maximize','Close','GamePicker','AccountEmail','AccountGamertag','ReceiptStatus','ReceiptDetail','ReceiptMinted','ReceiptExpires','ReceiptButton','LoadButton','ReceiptBusy','ReceiptProgress','ReceiptProgressText','ReceiptEta','TokenStatus','TokenDetail','TokenIssued','TokenExpires','TokenButton','TokenBusy','TokenProgress','TokenProgressText','TokenEta','CopyToken','PresenceStatus','PresenceDetail','PresenceButton','PresenceBusy','PresenceProgress','PresenceProgressText','PresenceEta','BulkButton','BulkBusy','BulkProgress','BulkProgressText','BulkSummary','CancelBulk','Activity','CopyLog','SaveLog','GitHub','OpenFiles','Installer')){$script:ui[$name]=$window.FindName($name)}
 foreach($name in @('AppScale','MainContent','RecoveryOverlay','RecoveryTitle','RecoveryMessage','RecoveryDetail','RecoveryOpen','RecoveryCancel','RecoveryWaiting','RecoveryProgress','RecoveryProgressLabel')){$script:ui[$name]=$window.FindName($name)}
 . "$appRoot\LegacyRecoveryUi.ps1"
 $script:games=@((Get-Content "$appRoot\backend\games.json" -Raw|ConvertFrom-Json).games)
@@ -51,7 +51,6 @@ function Update-Controls {
  $scanNext=Get-FullReceiptScanNext
  $ui.BulkButton.IsEnabled=(!$busy -and [DateTimeOffset]::UtcNow -ge $scanNext)
  $ui.BulkButton.ToolTip=if([DateTimeOffset]::UtcNow -lt $scanNext){'Bulk and Scan My Licenses share a cooldown. Next full scan after '+$scanNext.ToLocalTime().ToString('t')}else{'Downloads and saves receipts for entitled games. Shares the 15-minute cooldown with Scan My Licenses.'}
- $ui.Sharing.IsEnabled=!$busy
  $ui.Installer.IsEnabled=!$busy
  Set-Visible $ui.CopyToken ($tokenGood -and (!$busy -or $state.job.action -ne 'token'))
  if($state.receipt -and !$receiptGood){$ui.ReceiptStatus.Text='Receipt expired';$ui.ReceiptDetail.Text='Get a new pop.bin to mint more tokens.'}
@@ -285,13 +284,6 @@ $ui.SaveLog.add_Click({
 $ui.Installer.add_Click({
  try{$window.IsEnabled=$false;[Gfw8Sharing.ReceiptInstallerWindow]::Show($appRoot);Add-Activity 'Receipt installer closed. See ReceiptInstaller in saved files for backups and results.'}catch{Add-Activity $_.Exception.Message 'error'}finally{$window.IsEnabled=$true;Update-Controls}
 })
-$ui.Sharing.add_Click({
- try{
-  $window.IsEnabled=$false
-  $received=[Gfw8Sharing.SharingWindow]::Show($appRoot)
-  if($received){Set-ReceiptView ($received|ConvertFrom-Json);Add-Activity 'Shared receipt signature verified and saved.';Update-Controls}
- }catch{Add-Activity $_.Exception.Message 'error'}finally{$window.IsEnabled=$true;Update-Controls}
-})
 $ui.OpenFiles.add_Click({[Diagnostics.Process]::Start('explorer.exe','"'+$script:DataRoot+'"')|Out-Null})
 $ui.GitHub.add_Click({[Diagnostics.Process]::Start('https://github.com/thebreenis')|Out-Null})
 $ui.Minimize.add_Click({$window.WindowState='Minimized'})
@@ -319,7 +311,7 @@ $window.add_ContentRendered({
   $ui.AccountEmail.Text='player@example.com';$ui.AccountGamertag.Text='Xbox profile: PlayerOne'
   Add-Activity 'Layout test — no account or network request made.'
   if($LayoutReceiptPath){Start-Operation 'load' @{path=$LayoutReceiptPath}}
- }else{[Gfw8Sharing.ShareClient]::AutoStartAsync($appRoot);Start-Operation 'account' $null}
+ }else{Start-Operation 'account' $null}
 })
 try{$null=$window.ShowDialog()}finally{$timer.Stop()}
 

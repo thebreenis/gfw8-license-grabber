@@ -45,8 +45,8 @@ windows = Path(os.environ['WINDIR'])
 csc = windows / 'Microsoft.NET/Framework64/v4.0.30319/csc.exe'
 exe = fixture / 'FixtureCLI.exe'
 fixture_source = fixture / 'FixtureProgram.cs'
-fixture_source.write_text((ROOT / 'build/CliProgram.cs').read_text().replace('GFW8LicenseGrabber-', 'GFW8LG-Test-').replace('Gfw8Sharing.ShareClient.AutoStartAsync(runtime);', '{}'), encoding='utf-8')
-subprocess.run([str(csc), '/nologo', '/target:exe', '/platform:x64', '/reference:System.Windows.Forms.dll', '/reference:System.IO.Compression.dll', '/reference:System.Web.Extensions.dll', '/resource:' + str(payload) + ',GFW8.Payload', '/out:' + str(exe), '/reference:System.Security.dll', str(fixture_source), str(ROOT / 'src/cli/Sharing.cs'), str(ROOT / 'src/sharing/ShareCrypto.cs'), str(ROOT / 'src/sharing/ShareClient.cs')], check=True)
+fixture_source.write_text((ROOT / 'build/CliProgram.cs').read_text().replace('GFW8LicenseGrabber-', 'GFW8LG-Test-'), encoding='utf-8')
+subprocess.run([str(csc), '/nologo', '/target:exe', '/platform:x64', '/reference:System.Windows.Forms.dll', '/reference:System.IO.Compression.dll', '/reference:System.Web.Extensions.dll', '/resource:' + str(payload) + ',GFW8.Payload', '/out:' + str(exe), '/reference:System.Security.dll', str(fixture_source)], check=True)
 unlicensed = run(['--game', '28', '--receipt', '--token'], exe)
 check(unlicensed.returncode == 3, 'No-license exit code')
 check(unlicensed.stdout.count('Fixture: no license.') == 1, 'No-license event and final result print once')

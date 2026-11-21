@@ -8,9 +8,9 @@ By **Alec Breen | TheBreenis**.
 
 *App preview with example account details.*
 
-Download the versioned `GFW8 License Grabber v<version>.exe` from [Releases](https://github.com/thebreenis/gfw8-license-grabber/releases/latest). The single executable includes its backend; no adjacent files or Python installation are needed to run it. Current source versions: **GUI 1.10.3 / CLI 1.6.2**, including receipt sharing; see the [sharing guide](docs/SHARING.md). GUI 1.10.3 guards against development packages with a missing InstallLocation during token-helper inventory.
+Download the versioned `GFW8 License Grabber v<version>.exe` from [Releases](https://github.com/thebreenis/gfw8-license-grabber/releases/latest). The single executable includes its backend; no adjacent files or Python installation are needed to run it. Current source versions: **GUI 1.10.4 / CLI 1.6.3**. The paired receipt-sharing controls and agent were removed from these builds. GUI 1.10.3 and later guard against development packages with a missing InstallLocation during token-helper inventory.
 
-Prefer CMD? Download the separate versioned CLI executable from [Releases](https://github.com/thebreenis/gfw8-license-grabber/releases). It offers a cyan/purple/green interactive menu, the same 108-game backend and safeguards, and scriptable commands:
+The historical CLI 1.6.2 release remains available from [Releases](https://github.com/thebreenis/gfw8-license-grabber/releases); no new CLI release is planned. It offers a cyan/purple/green interactive menu, the same 108-game backend and safeguards, and scriptable commands:
 
 ```cmd
 "GFW8LG-CLI v1.6.2.exe" --game "Dragon Mania Legends" --receipt --token
@@ -21,7 +21,6 @@ See the [CLI guide](docs/CLI.md) for receipt import, Presence, cancellation, exi
 
 ## Features
 
-- Temporary and permanent receipt pairing, checkable peer catalogues, bulk downloads, transfer activity, and an optional background agent.
 - Receipt installation from folders, ZIP and 7z archives, with game identification and a preview before installation.
 - 108 receipt entries and 108 token attempt configurations.
 - Fresh receipts for installed or uninstalled games, plus signature-checked receipt import.
@@ -93,8 +92,8 @@ These tests use synthetic receipt outcomes and a local WPF test window. They do 
 | --- | --- |
 | `src/ui` | WPF/PowerShell GUI, launcher and supporting C# |
 | `src/native` | C++/WinRT authentication helper source |
-| `src/sharing` | Encrypted receipt sharing agent, IPC client and sharing window |
-| `relay` | Cloudflare Worker and Durable Objects relay |
+| `src/sharing` | Receipt installer support and retained historical paired-sharing source |
+| `relay` | Historical paired relay retained for earlier releases |
 | `src/cli` | Standalone console launcher, menus and command-line interface |
 | `src/metadata` | Retained manifests and additional-route provenance |
 | `backend` | Receipt/token backend, catalogue and required runtime dependencies |
@@ -105,6 +104,6 @@ These tests use synthetic receipt outcomes and a local WPF test window. They do 
 
 See [third-party notices](THIRD-PARTY-NOTICES.md) for the bundled Microsoft components and artwork attribution.
 
-The main GUI includes **Install Receipts** beside Receipt Sharing. Choose a folder, ZIP, or 7z, review matching games, and install verified pop.bin files into their package data folders. The CLI offers the same workflow with **I**. See [the installer guide](docs/RECEIPT-INSTALLER.md).
+The main GUI includes **Install Receipts**. Choose a folder, ZIP, or 7z, review matching games, and install verified pop.bin files into their package data folders. The CLI offers the same workflow with **I**. See [the installer guide](docs/RECEIPT-INSTALLER.md).
 
 Build integrity: exact runtime/source allowlists, pinned dependencies and portable compiler/input provenance are described in [BUILD-SECURITY.md](docs/BUILD-SECURITY.md). After verification, `python tools/freeze_release.py` freezes a local version without publishing or replacing an existing release.

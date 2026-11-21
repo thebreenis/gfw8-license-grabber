@@ -14,7 +14,7 @@ Run `"GFW8LG-CLI v1.6.2.exe"` with no arguments. The header shows the CLI versio
 
 The menu also offers bulk receipts, account/installation status, token clipboard copy, saving the sanitized activity log, and opening saved files. Presence asks before changing activity and submitting Last Played history. No achievement requests are made.
 
-Press **S** for receipt sharing: temporary/permanent codes, join, peer catalogues, automatic pulls, pause, shared-game selection and background mode. See the [sharing guide](SHARING.md).
+Historical CLI release 1.6.2 includes paired sharing. Source builds of 1.6.3 omit it. No CLI 1.6.3 release is planned.
 
 ## Commands
 

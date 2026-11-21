@@ -34,8 +34,9 @@ if payload.exists():
         expected_backend = {'backend/' + '/'.join(runtime_layout.NAMES.get(part, part) for part in Path(name).parts[1:])
                             for name in package_policy.manifest(ROOT)['backend']}
         expected_ui = {Path(name).name for name in package_policy.manifest(ROOT)['ui'] if Path(name).name != 'Launcher.cs'}
-        expected = expected_backend | expected_ui | {'README.txt','Sharing.dll','GFW8LG-Agent.exe','sharing-relay.json','sharing-icon.png'}
+        expected = expected_backend | expected_ui | {'README.txt','Sharing.dll'}
         assert set(archive.namelist()) == expected, 'Unexpected or missing GUI bundle member'
+        assert not any(name in archive.namelist() for name in ('GFW8LG-Agent.exe', 'sharing-relay.json', 'sharing-icon.png'))
         helper = 'backend/runtime/xbox-auth/shared-auth-helper/'
         inventory = json.loads(archive.read(helper + 'payload-inventory.json').decode('utf-8-sig'))
         for component in inventory:
@@ -60,15 +61,7 @@ if cli_payload.exists():
         assert archive.testzip() is None
         assert 'Worker.ps1' in archive.namelist()
         assert 'App.ps1' not in archive.namelist() and 'MainWindow.xaml' not in archive.namelist()
+        assert 'GFW8LG-Agent.exe' not in archive.namelist() and 'sharing-relay.json' not in archive.namelist()
         assert len(json.loads(archive.read('backend/games.json').decode('utf-8-sig'))['games']) == 108
         assert not any(Path(name).name.lower() in ('pop.bin', 'issued-token.xml', 'native-token.txt', 'registration.lock', 'appxmanifest.xml') for name in archive.namelist())
     print('PASS: minimal CLI bundle, all108 entries, CRC and private-artifact exclusions.')
-agent_payload = ROOT / 'build/agent-payload.zip'
-if agent_payload.exists():
-    with zipfile.ZipFile(agent_payload) as archive:
-        assert archive.testzip() is None
-        assert 'SharingBackend.ps1' in archive.namelist()
-        assert not any('Probe.exe' in name or 'Test-XboxExchange' in name or 'AcquireXboxToken' in name or 'private' in Path(name).name.lower() for name in archive.namelist())
-        assert 'backend/runtime/receipt-support/receipt-public.cer' in archive.namelist()
-        assert not any(Path(name).name.lower() in ('pop.bin', 'issued-token.xml', 'native-token.txt') for name in archive.namelist())
-    print('PASS: receipt-only agent payload, CRC and private-artifact exclusions.')
